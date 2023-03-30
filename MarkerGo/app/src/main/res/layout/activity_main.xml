@@ -15,13 +15,13 @@
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="30dp"
         android:text="Open Sign In Activity"
-        app:layout_constraintBottom_toTopOf="@+id/buttonUserProfile"
+        app:layout_constraintBottom_toTopOf="@+id/buttonUserProfileActivity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/buttonUserProfile"
+        android:id="@+id/buttonUserProfileActivity"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
@@ -29,13 +29,13 @@
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="30dp"
         android:text="Open User Profile Activity"
-        app:layout_constraintBottom_toTopOf="@+id/button4"
+        app:layout_constraintBottom_toTopOf="@+id/buttonMapsActivity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonSignInActivity" />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/buttonMapsActivity"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
@@ -43,13 +43,13 @@
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="30dp"
         android:text="Open Maps Activity"
-        app:layout_constraintBottom_toTopOf="@+id/button5"
+        app:layout_constraintBottom_toTopOf="@+id/buttonLocationDetailsActivity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonUserProfile" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonUserProfileActivity" />
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/buttonLocationDetailsActivity"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
@@ -60,5 +60,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button4" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonMapsActivity" />
 </androidx.constraintlayout.widget.ConstraintLayout>
