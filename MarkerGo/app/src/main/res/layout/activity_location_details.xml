@@ -65,6 +65,7 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:padding="5dp"
+                    android:onClick="getDirectionsToLocation"
                     android:text="Directions" />
 
                 <Button
@@ -73,6 +74,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
+                    android:onClick="checkInToLocation"
                     android:padding="5dp"
                     android:text="Check In" />
             </LinearLayout>
