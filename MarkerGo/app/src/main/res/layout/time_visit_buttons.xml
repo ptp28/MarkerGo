@@ -8,8 +8,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@color/design_default_color_primary_variant"
+        android:layout_margin="7dp"
+        android:background="@drawable/time_visit_button_bg"
         android:orientation="horizontal">
 
         <TextView
@@ -19,25 +19,25 @@
             android:text="Morning"
             android:textAlignment="center"
             android:textColor="@color/design_default_color_on_primary"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/design_default_color_primary"
             android:padding="10dp"
             android:text="100+"
             android:textAlignment="center"
             android:textColor="@color/design_default_color_on_primary"
-            android:textSize="12sp" />
+            android:background="@drawable/time_visit_button_count_bg"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@color/design_default_color_primary_variant"
+        android:layout_margin="7dp"
+        android:background="@drawable/time_visit_button_bg"
         android:orientation="horizontal">
 
         <TextView
@@ -47,25 +47,25 @@
             android:text="Afternoon"
             android:textAlignment="center"
             android:textColor="@color/design_default_color_on_primary"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/design_default_color_primary"
             android:padding="10dp"
             android:text="100+"
             android:textAlignment="center"
             android:textColor="@color/design_default_color_on_primary"
-            android:textSize="12sp" />
+            android:background="@drawable/time_visit_button_count_bg"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@color/design_default_color_primary_variant"
+        android:layout_margin="7dp"
+        android:background="@drawable/time_visit_button_bg"
         android:orientation="horizontal">
 
         <TextView
@@ -75,25 +75,25 @@
             android:text="Evening"
             android:textAlignment="center"
             android:textColor="@color/design_default_color_on_primary"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/design_default_color_primary"
             android:padding="10dp"
             android:text="100+"
             android:textAlignment="center"
             android:textColor="@color/design_default_color_on_primary"
-            android:textSize="12sp" />
+            android:background="@drawable/time_visit_button_count_bg"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@color/design_default_color_primary_variant"
+        android:layout_margin="7dp"
+        android:background="@drawable/time_visit_button_bg"
         android:orientation="horizontal">
 
         <TextView
@@ -103,17 +103,17 @@
             android:text="Night"
             android:textAlignment="center"
             android:textColor="@color/design_default_color_on_primary"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/design_default_color_primary"
             android:padding="10dp"
             android:text="100+"
             android:textAlignment="center"
             android:textColor="@color/design_default_color_on_primary"
-            android:textSize="12sp" />
+            android:background="@drawable/time_visit_button_count_bg"
+            android:textSize="14sp" />
 
     </LinearLayout>
 </LinearLayout>
