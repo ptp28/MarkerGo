@@ -1,298 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
-
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:collapsedTitleTextColor="@color/white"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleTextColor="@color/white"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:layout_scrollInterpolator="@android:anim/decelerate_interpolator"
-            app:title="Sample Place Name"
-            app:titleEnabled="true"
-            app:toolbarId="@+id/toolbar">
-
-            <ImageView
-                android:id="@+id/app_bar_image"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-
-                android:scaleType="centerCrop"
-                android:src="@drawable/fort"
-                app:srcCompat="@drawable/fort"
-                tools:srcCompat="@drawable/fort" />
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"></androidx.appcompat.widget.Toolbar>
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+        android:fitsSystemWindows="true">
 
-        <LinearLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:fitsSystemWindows="true">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:collapsedTitleTextColor="@color/white"
+                app:contentScrim="?attr/colorPrimary"
+                app:expandedTitleTextColor="@color/white"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:layout_scrollInterpolator="@android:anim/decelerate_interpolator"
+                app:title="Sample Place Name"
+                app:titleEnabled="true"
+                app:toolbarId="@+id/toolbar">
+
+                <ImageView
+                    android:id="@+id/app_bar_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/fort"
+                    app:srcCompat="@drawable/fort"
+                    tools:srcCompat="@drawable/fort" />
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"></androidx.appcompat.widget.Toolbar>
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/buttonGetDirections"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:padding="5dp"
-                    android:onClick="getDirectionsToLocation"
-                    android:text="Directions" />
-
-                <Button
-                    android:id="@+id/buttonCheckIn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:onClick="checkInToLocation"
-                    android:padding="5dp"
-                    android:text="Check In" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/textViewDescriptionLabel"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Description:"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/textViewDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/textViewEditLink"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Edit/Make a contribution"
-                    android:textColor="#03A9F4" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textViewTimeToVisitLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Best Time To Visit:"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <LinearLayout
+                    <Button
+                        android:id="@+id/buttonGetDirections"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal">
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:onClick="getDirectionsToLocation"
+                        android:padding="5dp"
+                        android:text="Directions" />
 
-                        <LinearLayout
-                            android:layout_height="wrap_content"
-                            android:layout_width="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_margin="10dp"
-                            android:background="@color/design_default_color_primary_variant">
+                    <Button
+                        android:id="@+id/buttonCheckIn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:onClick="checkInToLocation"
+                        android:padding="5dp"
+                        android:text="Check In" />
+                </LinearLayout>
 
-                            <TextView
-                                android:layout_width="100dp"
-                                android:layout_height="wrap_content"
-                                android:padding="10dp"
-                                android:text="Morning"
-                                android:textAlignment="center"
-                                android:textColor="@color/design_default_color_on_primary"
-                                android:textSize="14sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:background="@color/design_default_color_primary"
-                                android:padding="10dp"
-                                android:textAlignment="center"
-                                android:textColor="@color/design_default_color_on_primary"
-                                android:textSize="12sp"
-                                android:text="100+" />
+                    <TextView
+                        android:id="@+id/textViewDescriptionLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Description:"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
-                        </LinearLayout>
+                    <TextView
+                        android:id="@+id/textViewDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+                        android:textSize="16sp" />
 
-                        <LinearLayout
-                            android:layout_height="wrap_content"
-                            android:layout_width="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_margin="10dp"
-                            android:background="@color/design_default_color_primary_variant">
+                    <TextView
+                        android:id="@+id/textViewEditLink"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Edit/Make a contribution"
+                        android:textColor="#03A9F4" />
 
-                            <TextView
-                                android:layout_width="100dp"
-                                android:textAlignment="center"
-                                android:layout_height="wrap_content"
-                                android:padding="10dp"
-                                android:text="Afternoon"
-                                android:textColor="@color/design_default_color_on_primary"
-                                android:textSize="14sp" />
+                </LinearLayout>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:background="@color/design_default_color_primary"
-                                android:padding="10dp"
-                                android:textAlignment="center"
-                                android:textColor="@color/design_default_color_on_primary"
-                                android:textSize="12sp"
-                                android:text="100+" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
 
-                        </LinearLayout>
+                    <TextView
+                        android:id="@+id/textViewTimeToVisitLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Best Time To Visit:"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
-                        <LinearLayout
-                            android:layout_height="wrap_content"
-                            android:layout_width="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_margin="10dp"
-                            android:background="@color/design_default_color_primary_variant">
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
-                            <TextView
-                                android:layout_width="100dp"
-                                android:textAlignment="center"
-                                android:layout_height="wrap_content"
-                                android:padding="10dp"
-                                android:text="Evening"
-                                android:textColor="@color/design_default_color_on_primary"
-                                android:textSize="14sp" />
+                        <include layout="@layout/time_visit_buttons" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:background="@color/design_default_color_primary"
-                                android:padding="10dp"
-                                android:textAlignment="center"
-                                android:textColor="@color/design_default_color_on_primary"
-                                android:textSize="12sp"
-                                android:text="100+" />
+                    </HorizontalScrollView>
 
-                        </LinearLayout>
+                </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_height="wrap_content"
-                            android:layout_width="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_margin="10dp"
-                            android:background="@color/design_default_color_primary_variant">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
 
-                            <TextView
-                                android:layout_width="100dp"
-                                android:textAlignment="center"
-                                android:layout_height="wrap_content"
-                                android:padding="10dp"
-                                android:text="Night"
-                                android:textColor="@color/design_default_color_on_primary"
-                                android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/textViewStatisticsLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Stats:"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:background="@color/design_default_color_primary"
-                                android:padding="10dp"
-                                android:textAlignment="center"
-                                android:textColor="@color/design_default_color_on_primary"
-                                android:textSize="12sp"
-                                android:text="100+" />
+                    <TextView
+                        android:id="@+id/textViewStatistics"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="10+ people visited this marker this week."
+                        android:textSize="16sp" />
+                </LinearLayout>
 
-                        </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
 
-                    </LinearLayout>
-                </HorizontalScrollView>
+                    <TextView
+                        android:id="@+id/textViewPhotosLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Photos:"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewImages"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="vertical" />
+                </LinearLayout>
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textViewStatisticsLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Stats:"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/textViewStatistics"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="10+ people visited this marker this week."
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textViewPhotosLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Photos:"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/recyclerViewImages"
-                    android:scrollbars="vertical"/>
-            </LinearLayout>
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
