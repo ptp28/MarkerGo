@@ -27,5 +27,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(getApplicationContext(), LocationDetailsActivity.class));
     }
 
-
+    public void openLoginActivity(View view) {
+        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+    }
 }
