@@ -25,7 +25,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCueEDdkWCIsko0Otdrh200DyJcm4pqvEE"/>
+            android:value="AIzaSyCueEDdkWCIsko0Otdrh200DyJcm4pqvEE" />
 
         <activity
             android:name=".landingPage"
@@ -39,12 +39,12 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="false"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:exported="false" />
         <activity
             android:name=".SignupActivity"
-            android:exported="false"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -55,6 +55,8 @@
             </intent-filter>
         </activity>
     </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 </manifest>

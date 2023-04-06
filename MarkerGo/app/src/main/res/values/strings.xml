@@ -3,4 +3,5 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>
+    <string name="web_client_id">60683068097-2pni9kmmdg9gkeob9mlqvcdbs9khncu4.apps.googleusercontent.com</string>
 </resources>
