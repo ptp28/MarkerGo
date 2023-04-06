@@ -19,6 +19,9 @@
         android:theme="@style/Theme.MarkerGo"
         tools:targetApi="31">
         <activity
+            android:name=".AllLocationPhotosActivity"
+            android:exported="false" />
+        <activity
             android:name=".FacebookAuthActivity"
             android:exported="false" />
         <!--
