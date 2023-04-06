@@ -20,6 +20,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.identity.BeginSignInResult;
 import com.google.android.gms.auth.api.identity.Identity;
@@ -32,6 +38,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -123,7 +130,13 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
+    public void signInWithFacebook(View view) {
+        Intent intent = new Intent(getApplicationContext(), FacebookAuthActivity.class);
+        startActivity(intent);
+    }
+
     public void signInWithGoogle(View view) {
+        Log.i("sup", "sup");
         oneTapClient.beginSignIn(signInRequest)
                 .addOnSuccessListener(this, result -> {
                     IntentSenderRequest intentSenderRequest =
@@ -133,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnFailureListener(this, e -> Log.d("err-sign", e.getLocalizedMessage()));
     }
 
-    private void displayToast(String text) {
+    protected void displayToast(String text) {
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
 }

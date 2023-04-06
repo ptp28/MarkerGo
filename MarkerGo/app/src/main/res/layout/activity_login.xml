@@ -149,7 +149,8 @@
                     android:layout_marginEnd="16dp"
                     android:layout_weight="0.5"
                     android:background="@drawable/social_btn_background"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:onClick="signInWithFacebook">
 
                     <ImageView
                         android:id="@+id/imageView99"
