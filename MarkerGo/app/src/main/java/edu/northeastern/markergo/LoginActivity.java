@@ -10,11 +10,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
-    private EditText email;
-    private EditText password;
+    private EditText emailText;
+    private EditText passwordText;
     private TextView signupText;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +32,9 @@ public class LoginActivity extends AppCompatActivity {
         s.setSpan(new UnderlineSpan(), text.indexOf("Create Here"), s.length(), 0);
         signupText.setText(s);
 
-        email = findViewById(R.id.email);
-        password = findViewById(R.id.password);
+        mAuth = FirebaseAuth.getInstance();
+        emailText = findViewById(R.id.email);
+        passwordText = findViewById(R.id.password);
     }
 
     public void openSignupActivity(View view) {
@@ -36,6 +42,19 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void authenticate(View view) {
-        // authenticate
+        String email = emailText.getText().toString();
+        String password = passwordText.getText().toString();
+
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                displayToast("Login success!");
+            } else {
+                displayToast("incorrect Credentials");
+            }
+        });
+    }
+
+    private void displayToast(String text) {
+        Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
 }
