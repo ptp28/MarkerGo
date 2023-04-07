@@ -34,6 +34,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
@@ -46,6 +47,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     public double latitude;
     public double longitude;
     LocationRequest locationRequest;
+    Marker currentLocationMarker;
 
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -143,13 +145,16 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
 
     private void UpdateCurrentLocation() {
         Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
+        if(currentLocationMarker != null) {
+            currentLocationMarker.remove();
+        }
         LatLng latLng = new LatLng(currentLocation.getLatitude(),
                 currentLocation.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
                 .title("Here I am!");
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5));
-        googleMap.addMarker(markerOptions);
+        currentLocationMarker = googleMap.addMarker(markerOptions);
     }
 
     @Override
