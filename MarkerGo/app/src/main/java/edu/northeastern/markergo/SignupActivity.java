@@ -3,13 +3,18 @@ package edu.northeastern.markergo;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+
+import edu.northeastern.markergo.utils.Util;
 
 public class SignupActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -28,6 +33,16 @@ public class SignupActivity extends AppCompatActivity {
         emailText = findViewById(R.id.email);
         passwordText = findViewById(R.id.password);
         confirmPasswordText = findViewById(R.id.confirmPassword);
+
+        TextView loginText = findViewById(R.id.loginText);
+        String text = loginText.getText().toString();
+        SpannableString s = new SpannableString(text);
+        s.setSpan(new UnderlineSpan(), text.indexOf("Login Here"), s.length(), 0);
+        loginText.setText(s);
+    }
+
+    public void openLoginActivity(View view) {
+        super.finish();
     }
 
     public void signup(View view) {
@@ -37,14 +52,28 @@ public class SignupActivity extends AppCompatActivity {
         String name = nameText.getText().toString();
 
         // check password == confirmPassword or not
+        boolean isValidEmail = Util.isValidEmail(email);
+        boolean isValidPassword = Util.isValidPassword(password);
+        boolean passwordMatches = Util.passwordMatches(password, confirmPassword);
 
-        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
-            if (task.isSuccessful()) {
-                addNameToUserprofile(name);
-            } else {
-                displayToast("Account with this email exists already!");
-            }
-        });
+        if (!isValidEmail && !isValidPassword) {
+            emailText.setError("Invalid email");
+            passwordText.setError("Password does not satisfy all constraints");
+        } else if (!isValidEmail) {
+            emailText.setError("Invalid email");
+        } else if (!isValidPassword) {
+            passwordText.setError("Password does not satisfy all constraints");
+        } else if (!passwordMatches) {
+            confirmPasswordText.setError("Both password don't match");
+        } else {
+            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    addNameToUserprofile(name);
+                } else {
+                    displayToast("Account with this email exists already!");
+                }
+            });
+        }
     }
 
     private void addNameToUserprofile(String name) {
