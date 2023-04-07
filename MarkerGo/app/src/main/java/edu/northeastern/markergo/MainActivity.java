@@ -44,4 +44,8 @@ public class MainActivity extends AppCompatActivity {
         }
         startActivity(new Intent(getApplicationContext(), LoginActivity.class));
     }
+
+    public void openUserProfileActivity(View view) {
+        startActivity(new Intent(getApplicationContext(), UserProfileActivity.class));
+    }
 }
