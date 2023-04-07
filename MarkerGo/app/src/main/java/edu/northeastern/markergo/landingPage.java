@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -25,8 +27,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class landingPage extends AppCompatActivity implements OnMapReadyCallback {
@@ -43,7 +47,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
 
-        locationRequest = new LocationRequest();
+        locationRequest = LocationRequest.create();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -84,9 +88,12 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         LatLng currentLoc = new LatLng(latitude,longitude);
         googleMap.addMarker(new MarkerOptions()
                 .position(currentLoc)
-                .title("Current Location"));
+                .title("Current Location")
+                .snippet("Tag: Random")
+        );
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc,5));
     }
+
 
 
 }
