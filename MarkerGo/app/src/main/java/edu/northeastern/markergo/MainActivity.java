@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openLoginActivity(View view) {
-        if (mAuth.getCurrentUser() != null) {
+        if(mAuth.getCurrentUser() != null) {
             Toast.makeText(
                             getApplicationContext(),
                             "already logged in, signing out",
