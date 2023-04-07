@@ -11,6 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
@@ -55,6 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="62dp"
                 app:boxBackgroundMode="none">
+
                 <EditText
                     android:id="@+id/name"
                     android:layout_width="match_parent"
@@ -82,6 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="62dp"
                 app:boxBackgroundMode="none">
+
                 <EditText
                     android:id="@+id/email"
                     android:layout_width="match_parent"
@@ -108,8 +111,8 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="62dp"
-                app:passwordToggleEnabled="true"
-                app:boxBackgroundMode="none">
+                app:boxBackgroundMode="none"
+                app:passwordToggleEnabled="true">
 
                 <EditText
                     android:id="@+id/password"
@@ -126,10 +129,18 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
-                android:id="@+id/textView5"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="12dp"
+                android:text="Minimum 8 characters with 1 letter, digit, special character"
+                android:textSize="13sp"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="17dp"
                 android:text="Confirm Password"
                 android:textColor="#000000"
                 android:textSize="20sp"
@@ -138,8 +149,8 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="62dp"
-                app:passwordToggleEnabled="true"
-                app:boxBackgroundMode="none">
+                app:boxBackgroundMode="none"
+                app:passwordToggleEnabled="true">
 
                 <EditText
                     android:id="@+id/confirmPassword"
@@ -155,6 +166,15 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:id="@+id/loginText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Have An Account? Login Here"
+                android:onClick="openLoginActivity"
+                android:textAlignment="center" />
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/signup"
                 style="@android:style/Widget.Button"
@@ -162,8 +182,8 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="30dp"
                 android:background="@drawable/button_background"
-                android:text="Signup"
                 android:onClick="signup"
+                android:text="Signup"
                 android:textColor="#FFFFFF"
                 android:textSize="25sp"
                 android:textStyle="bold" />
