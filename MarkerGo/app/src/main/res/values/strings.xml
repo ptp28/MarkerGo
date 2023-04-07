@@ -4,4 +4,8 @@
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>
     <string name="maps_api_key">AIzaSyCueEDdkWCIsko0Otdrh200DyJcm4pqvEE</string>
+    <string name="web_client_id">60683068097-2pni9kmmdg9gkeob9mlqvcdbs9khncu4.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">760752848968889</string>
+    <string name="fb_login_protocol_scheme">fb760752848968889</string>
+    <string name="facebook_client_token">728874e2c55eaf5ce40a156f2e35512c</string>
 </resources>

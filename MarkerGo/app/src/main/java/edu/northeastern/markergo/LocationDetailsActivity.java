@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -26,21 +27,29 @@ import java.util.List;
 public class LocationDetailsActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewImages;
-    private TextView descriptionTextView;
-    private Button getDirectionsButton;
-    private Button checkInButton;
     RecyclerView.LayoutManager imageGridLayoutManager;
     ImageRecyclerViewAdapter recyclerViewAdapter;
     List<Integer> imageList;
+    private TextView descriptionTextView;
+    private TextView seeAllPhotosLinkTextView;
+    private TextView addPhotoTextView;
+    private Button getDirectionsButton;
+    private Button checkInButton;
+
+    public static final int PICK_IMAGE_REQUEST_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_details);
 
-        recyclerViewImages = findViewById(R.id.recyclerViewImages);
         descriptionTextView = (TextView) findViewById(R.id.textViewDescription);
         getDirectionsButton = (Button) findViewById(R.id.buttonGetDirections);
+        seeAllPhotosLinkTextView = (TextView) findViewById(R.id.textViewAllPhotosLink);
+        addPhotoTextView = (TextView) findViewById(R.id.textViewAddPhoto);
         checkInButton = (Button) findViewById(R.id.buttonCheckIn);
+
+        recyclerViewImages = findViewById(R.id.recyclerViewImages);
         imageGridLayoutManager = new GridLayoutManager(this, 3);
         recyclerViewImages.setLayoutManager(imageGridLayoutManager);
 
@@ -61,6 +70,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
         recyclerViewImages.setHasFixedSize(true);
 
         checkInButton.setOnClickListener(checkInButtonListener);
+        seeAllPhotosLinkTextView.setOnClickListener(openAllPhotosActivityListner);
+        addPhotoTextView.setOnClickListener(addPhotosClickListener);
+
         getDirectionsButton.setOnClickListener(getDirectionsListener);
     }
 
@@ -81,4 +93,37 @@ public class LocationDetailsActivity extends AppCompatActivity {
             Toast.makeText(LocationDetailsActivity.this, "Get Directions", Toast.LENGTH_SHORT).show();
         }
     };
+
+    View.OnClickListener openAllPhotosActivityListner = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent photoRecyclerIntent = new Intent(getApplicationContext(), AllLocationPhotosActivity.class);
+            photoRecyclerIntent.putIntegerArrayListExtra("AllImages", (ArrayList<Integer>) imageList);
+            startActivity(photoRecyclerIntent);
+        }
+    };
+
+    View.OnClickListener addPhotosClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            getIntent.setType("image/*");
+
+            Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            pickIntent.setType("image/*");
+
+            Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+
+            startActivityForResult(chooserIntent, PICK_IMAGE_REQUEST_CODE);
+        }
+    };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST_CODE) {
+            Toast.makeText(this, "Image picked", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

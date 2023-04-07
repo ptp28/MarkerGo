@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "402284194754",
+    "project_id": "markergo-6a33d",
+    "storage_bucket": "markergo-6a33d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:402284194754:android:c3a0c7a858b1987894045b",
+        "android_client_info": {
+          "package_name": "edu.northeastern.markergo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "402284194754-tpc11ntj84kgcphf9h0ba6bbn7nijltb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.northeastern.markergo",
+            "certificate_hash": "f10d65a42683e15811a1b3205701687eb1fb0f5d"
+          }
+        },
+        {
+          "client_id": "402284194754-k2f5sp1923nui94uijc3ifmhbldupnu1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCs-VyvNIviNV81SiDxm4LISWbD3TN7IIQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "402284194754-g3r3jc4ofupkv6h25pck8f8rre2lr915.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
