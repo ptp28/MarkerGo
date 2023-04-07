@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import edu.northeastern.markergo.tempForNow.Temp;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
