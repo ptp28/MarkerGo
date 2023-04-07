@@ -26,14 +26,12 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 
 public class FacebookAuthActivity extends LoginActivity {
-    private FirebaseAuth mAuth;
     private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAuth = FirebaseAuth.getInstance();
         callbackManager = CallbackManager.Factory.create();
 
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("email", "public_profile"));
@@ -41,8 +39,9 @@ public class FacebookAuthActivity extends LoginActivity {
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        // App code
-                        handleFacebookAccessToken(loginResult.getAccessToken());
+                        AccessToken token = loginResult.getAccessToken();
+                        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+                        authenticate(credential);
                     }
 
                     @Override
@@ -61,20 +60,5 @@ public class FacebookAuthActivity extends LoginActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void handleFacebookAccessToken(AccessToken token) {
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        Log.i("info", user.getEmail());
-                        displayToast(user.getDisplayName());
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Authentication failed.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 }

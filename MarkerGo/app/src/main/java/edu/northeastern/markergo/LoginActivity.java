@@ -38,20 +38,23 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText emailText;
     private EditText passwordText;
     private TextView signupText;
     private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private AuthCredential credential;
     private SignInClient oneTapClient;
     private BeginSignInRequest signInRequest;
-    private static final int REQ_ONE_TAP = 2;  // Can be any integer unique to the Activity.
-    private boolean showOneTapUI = true;
     private ActivityResultLauncher<IntentSenderRequest> activityResultLauncher;
 
     @Override
@@ -84,10 +87,11 @@ public class LoginActivity extends AppCompatActivity {
                 registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         try {
-                            SignInCredential credential = oneTapClient.getSignInCredentialFromIntent(result.getData());
-                            String idToken = credential.getGoogleIdToken();
+                            SignInCredential cred = oneTapClient.getSignInCredentialFromIntent(result.getData());
+                            String idToken = cred.getGoogleIdToken();
                             if (idToken != null) {
-                                authenticateGoogle(idToken);
+                                credential = GoogleAuthProvider.getCredential(idToken, null);
+                                authenticate(credential);
                             }
                         } catch (ApiException e) {
                             e.printStackTrace();
@@ -100,39 +104,12 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(new Intent(getApplicationContext(), SignupActivity.class));
     }
 
-    public void authenticate(View view) {
+    public void signInNormal(View view) {
         String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
 
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
-            if (task.isSuccessful()) {
-                displayToast("Login success!");
-            } else {
-                displayToast("incorrect Credentials");
-            }
-        });
-    }
-
-    public void authenticateGoogle(String idToken) {
-        AuthCredential firebaseCredential = GoogleAuthProvider.getCredential(idToken, null);
-        mAuth.signInWithCredential(firebaseCredential)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d("succ", "signInWithCredential:success");
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        assert user != null;
-                        displayToast(user.getEmail());
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("err-auth", "signInWithCredential:failure", task.getException());
-                    }
-                });
-    }
-
-    public void signInWithFacebook(View view) {
-        Intent intent = new Intent(getApplicationContext(), FacebookAuthActivity.class);
-        startActivity(intent);
+        credential = EmailAuthProvider.getCredential(email, password);
+        authenticate(credential);
     }
 
     public void signInWithGoogle(View view) {
@@ -144,6 +121,24 @@ public class LoginActivity extends AppCompatActivity {
                     activityResultLauncher.launch(intentSenderRequest);
                 })
                 .addOnFailureListener(this, e -> Log.d("err-sign", e.getLocalizedMessage()));
+    }
+
+    public void signInWithFacebook(View view) {
+        Intent intent = new Intent(getApplicationContext(), FacebookAuthActivity.class);
+        startActivity(intent);
+    }
+
+    protected void authenticate(AuthCredential credential) {
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        user = mAuth.getCurrentUser();
+                        assert user != null;
+                        displayToast(user.getProviderData().get(1).getEmail());
+                    } else {
+                        displayToast("Authentication failed");
+                    }
+                });
     }
 
     protected void displayToast(String text) {

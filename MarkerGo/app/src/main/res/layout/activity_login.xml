@@ -213,7 +213,7 @@
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:text="Login"
-                android:onClick="authenticate"/>
+                android:onClick="signInNormal"/>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
