@@ -12,11 +12,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -33,13 +37,17 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 public class landingPage extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -142,6 +150,23 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = this.googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.google_maps_style));
+            if (!success) {
+                Log.e("GOOGLE_MAPS_ERROR", "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e("GOOGLE_MAPS_ERROR", "Can't find style. Error: ", e);
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            askRequiredLocationPermissions();
+            return;
+        }
+        this.googleMap.setMyLocationEnabled(true);
     }
 
     private void UpdateCurrentLocation() {
@@ -151,11 +176,22 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         }
         LatLng latLng = new LatLng(currentLocation.getLatitude(),
                 currentLocation.getLongitude());
+
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.user_marker, getTheme());
+        Bitmap userMarker = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 100, 156, false);
+
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                .title("Here I am!");
+                .title("{{User Name}}")
+                .icon(BitmapDescriptorFactory.fromBitmap(userMarker));
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
         currentLocationMarker = googleMap.addMarker(markerOptions);
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(@NonNull Marker marker) {
+                openLocationDetails(marker);
+            }
+        });
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
     }
@@ -170,6 +206,12 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 }
                 break;
         }
+    }
+
+    public void openLocationDetails(Marker marker) {
+        Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
+        locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
+        startActivity(locationDetailsActivityIntent);
     }
 
 }

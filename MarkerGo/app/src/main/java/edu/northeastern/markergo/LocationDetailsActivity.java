@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private Button getDirectionsButton;
     private Button checkInButton;
 
+    private Location currentLocation;
+
     public static final int PICK_IMAGE_REQUEST_CODE = 1;
 
     @Override
@@ -52,6 +55,14 @@ public class LocationDetailsActivity extends AppCompatActivity {
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
         imageGridLayoutManager = new GridLayoutManager(this, 3);
         recyclerViewImages.setLayoutManager(imageGridLayoutManager);
+
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null && bundle.containsKey("currentLocation")) {
+            Toast.makeText(this, String.valueOf(currentLocation.getLongitude()), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            imageList = new ArrayList<>();
+        }
 
         imageList = new ArrayList<>();
         imageList.add(R.drawable.lake);
@@ -81,6 +92,12 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     View.OnClickListener checkInButtonListener = new View.OnClickListener() {
+        private double latitude = 0;
+        private double longitude = 0;
+
+        private float[] distance = new float[10];
+//        Location.distanceBetween(this.currentLocation.getLatitude(), currentLocation.getLongitude(), this.latitude, this.longitude, distance);
+
         @Override
         public void onClick(View v) {
             Toast.makeText(LocationDetailsActivity.this, "Check In", Toast.LENGTH_SHORT).show();
