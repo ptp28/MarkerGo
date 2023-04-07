@@ -117,6 +117,7 @@ public class LoginActivity extends AppCompatActivity {
                         user = mAuth.getCurrentUser();
                         assert user != null;
                         displayToast(user.getProviderData().get(1).getEmail());
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     } else {
                         displayToast("Authentication failed");
                     }

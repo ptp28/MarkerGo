@@ -30,6 +30,7 @@
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="30dp"
         android:text="Open User Profile Activity"
+        android:onClick="openUserProfileActivity"
         app:layout_constraintBottom_toTopOf="@+id/buttonMapsActivity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
