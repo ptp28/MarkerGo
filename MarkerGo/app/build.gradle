@@ -51,6 +51,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:9.6.1'
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-storage'
+
+    implementation 'com.opencsv:opencsv:4.6'
 }
 
 apply plugin: 'com.google.gms.google-services'
