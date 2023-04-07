@@ -35,6 +35,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
@@ -44,14 +45,12 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
 
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
-    public double latitude;
-    public double longitude;
-    LocationRequest locationRequest;
 
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int FINE_LOCATION_REQUEST_CODE = 10;
     private GoogleMap googleMap;
+    private Marker myMarker;
     private LocationManager locationManager;
     private LocationListener locationListener;
 
@@ -59,7 +58,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
-
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
@@ -146,11 +144,12 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
         LatLng latLng = new LatLng(currentLocation.getLatitude(),
                 currentLocation.getLongitude());
+        myMarker.remove();
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
                 .title("Here I am!");
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 7));
-        googleMap.addMarker(markerOptions);
+        myMarker = googleMap.addMarker(markerOptions);
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
     }
