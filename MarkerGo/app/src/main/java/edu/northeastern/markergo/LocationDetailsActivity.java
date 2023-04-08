@@ -33,6 +33,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class LocationDetailsActivity extends AppCompatActivity {
 
@@ -177,14 +178,31 @@ public class LocationDetailsActivity extends AppCompatActivity {
             Toast.makeText(this, "Image picked", Toast.LENGTH_SHORT).show();
 
             Uri file = data.getData();
-            imagesRef.child(file.getLastPathSegment())
-                    .putFile(file)
-                    .addOnSuccessListener(taskSnapshot -> {
+            StorageReference ref = imagesRef.child(file.getLastPathSegment());
+            UploadTask uploadTask = ref.putFile(file);
+            uploadTask.addOnSuccessListener(taskSnapshot -> {
                         Log.i("status", "upload successful");
                     })
                     .addOnFailureListener(e -> {
                         Log.i("status", "upload failed");
                     });
+            uploadTask.continueWithTask(task -> {
+                        if (task.isSuccessful()) {
+                            return ref.getDownloadUrl();
+                        } else {
+                            throw Objects.requireNonNull(task.getException());
+                        }
+                    })
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Uri uri = task.getResult();
+                            // imageList.add(uri.toString());
+                            // refresh recycler view
+                        } else {
+                            Log.i("status", "failed to get download url");
+                        }
+                    });
+
         } else {
             Log.i("reqCode", Integer.toString(requestCode));
             Log.i("resCode", Integer.toString(resultCode));
