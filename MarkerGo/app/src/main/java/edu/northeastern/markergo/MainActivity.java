@@ -1,14 +1,31 @@
 package edu.northeastern.markergo;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -28,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }));
         }
+
+//        addMarkers();
     }
 
     public void openLocationDetailsActivity(View view) {
@@ -35,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openLoginActivity(View view) {
-        if(mAuth.getCurrentUser() != null) {
+        if (mAuth.getCurrentUser() != null) {
             Toast.makeText(
                             getApplicationContext(),
                             "already logged in, signing out",
@@ -49,4 +68,51 @@ public class MainActivity extends AppCompatActivity {
     public void openUserProfileActivity(View view) {
         startActivity(new Intent(getApplicationContext(), UserProfileActivity.class));
     }
+
+//    private void addMarkers() {
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        InputStream is = getResources().openRawResource(R.raw.updated_places);
+//        BufferedReader reader = new BufferedReader(
+//                new InputStreamReader(is, StandardCharsets.UTF_8));
+//        String line = "";
+//
+//        try {
+//            reader.readLine();
+//            int cnt = 0;
+//            while ((line = reader.readLine()) != null) {
+//                cnt++;
+//                // Split the line into different tokens (using the comma as a separator).
+//                String[] entry = line.split(",");
+//
+//                Map<String, Object> data = new HashMap<>();
+//                data.put("name", entry[0]);
+//
+//                Location location = new Location("");
+//                location.setLatitude(Double.parseDouble(entry[1]));
+//                location.setLongitude(Double.parseDouble(entry[2]));
+//                data.put("location", location);
+//
+//                data.put("description", entry[3]);
+//
+//                Map<String, Integer> stats = new HashMap<>();
+//                stats.put("Morning", 0);
+//                stats.put("Afternoon", 0);
+//                stats.put("Evening", 0);
+//                stats.put("Night", 0);
+//                data.put("visitationStatsByTime", stats);
+//
+//                data.put("visitationsThisWeek", 0);
+//                data.put("photos", new ArrayList<>());
+//                data.put("addedBy", "sPevFgcG55cIUoWUIN85a0GzqV32");
+//
+//                int finalCnt = cnt;
+//                db.collection("markers")
+//                        .add(data)
+//                        .addOnCompleteListener(task -> Log.i("status", "done " + finalCnt));
+//            }
+//        } catch (IOException e1) {
+//            Log.e("MainActivity", "Error" + line, e1);
+//            e1.printStackTrace();
+//        }
+//    }
 }

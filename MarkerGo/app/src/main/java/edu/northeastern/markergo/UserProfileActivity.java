@@ -39,7 +39,8 @@ public class UserProfileActivity extends AppCompatActivity {
 
         usernameTV.setText(user.getDisplayName());
         email.setText(user.getProviderData().get(1).getEmail());
-        String photoUrl = user.getPhotoUrl().toString();
+        String photoUrl = String.valueOf(user.getPhotoUrl());
+//        user.getPhotoUrl();
 
         System.out.println("Email = " + user.getProviderData().get(1).getEmail());
         System.out.println("Name = " + user.getDisplayName());
