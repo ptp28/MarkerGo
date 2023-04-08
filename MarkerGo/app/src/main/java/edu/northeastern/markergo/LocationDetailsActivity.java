@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,10 +58,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
         recyclerViewImages.setLayoutManager(imageGridLayoutManager);
 
         Bundle bundle = getIntent().getExtras();
-        if(bundle != null && bundle.containsKey("currentLocation")) {
-            Toast.makeText(this, String.valueOf(currentLocation.getLongitude()), Toast.LENGTH_SHORT).show();
-        }
-        else {
+        if (bundle != null && bundle.containsKey("currentLocation")) {
+            currentLocation = (Location) bundle.get("currentLocation");
+        } else {
             imageList = new ArrayList<>();
         }
 
@@ -108,6 +108,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             Toast.makeText(LocationDetailsActivity.this, "Get Directions", Toast.LENGTH_SHORT).show();
+            String locationURI = ("http://maps.google.com/maps?saddr=Current%20Location&daddr=" + currentLocation.getLatitude() + ", " + currentLocation.getLongitude() + "");
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(locationURI));
+            startActivity(browserIntent);
         }
     };
 
@@ -132,7 +135,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
             Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 
             Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent, captureIntent});
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent, captureIntent});
 
             startActivityForResult(chooserIntent, PICK_IMAGE_REQUEST_CODE);
         }

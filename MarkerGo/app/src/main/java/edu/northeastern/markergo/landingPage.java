@@ -213,5 +213,4 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
         startActivity(locationDetailsActivityIntent);
     }
-
 }
