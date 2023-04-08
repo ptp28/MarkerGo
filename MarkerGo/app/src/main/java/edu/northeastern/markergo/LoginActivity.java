@@ -122,14 +122,16 @@ public class LoginActivity extends AppCompatActivity {
     public void signInWithFacebook(View view) {
         Intent intent = new Intent(getApplicationContext(), FacebookAuthActivity.class);
         startActivity(intent);
+        super.finish();
     }
 
     protected void authenticate(AuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
+                        displayToast("Login successful");
                         addUserToDb();
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        super.finish();
                     } else {
                         displayToast("Authentication failed");
                     }

@@ -70,6 +70,7 @@ public class SignupActivity extends AppCompatActivity {
             mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
                     addNameToUserprofile(name);
+                    displayToast("Signup successful");
                 } else {
                     displayToast("Account with this email exists already!");
                 }
