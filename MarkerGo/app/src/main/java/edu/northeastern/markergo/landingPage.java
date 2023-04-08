@@ -240,10 +240,9 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                             @Override
                             public void accept(DocumentSnapshot documentSnapshot) {
                                 Log.d(TAG, String.valueOf(documentSnapshot.get("description")));
-                                Map<String, Object> locationMap = (Map<String, Object>) documentSnapshot.get("location");
 
 
-                                LatLng latLng = new LatLng((Double) locationMap.get("latitude"), (Double) locationMap.get("longitude"));
+                                LatLng latLng = new LatLng((Double) documentSnapshot.get("latitude"), (Double) documentSnapshot.get("longitude"));
                                 MarkerOptions markerOptions = new MarkerOptions().position(latLng)
                                         .title((String) documentSnapshot.get("name"));
                                 googleMap.addMarker(markerOptions);
