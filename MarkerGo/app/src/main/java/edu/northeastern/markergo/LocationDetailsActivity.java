@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -37,6 +38,11 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +52,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private RecyclerView recyclerViewImages;
     RecyclerView.LayoutManager imageGridLayoutManager;
     ImageRecyclerViewAdapter recyclerViewAdapter;
-    List<Integer> imageList;
+    List<Bitmap> imageList;
     private TextView descriptionTextView;
     private TextView seeAllPhotosLinkTextView;
     private TextView addPhotoTextView;
@@ -91,16 +97,16 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
         populateImageList();
 
-        imageList.add(R.drawable.lake);
-        imageList.add(R.drawable.fort);
-        imageList.add(R.drawable.bridge);
-        imageList.add(R.drawable.fort1);
-        imageList.add(R.drawable.monastery);
-        imageList.add(R.drawable.fort2);
-        imageList.add(R.drawable.palace);
-        imageList.add(R.drawable.fort3);
-        imageList.add(R.drawable.tent);
-        imageList.add(R.drawable.fort4);
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.lake));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.bridge));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort1));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.monastery));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort2));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.palace));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort3));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.tent));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort4));
         recyclerViewAdapter = new ImageRecyclerViewAdapter(imageList);
 
         recyclerViewImages.setAdapter(recyclerViewAdapter);
@@ -119,6 +125,19 @@ public class LocationDetailsActivity extends AppCompatActivity {
                         ref.getDownloadUrl().addOnSuccessListener(uri -> {
                             Log.i("idk", uri.toString());
                             // imageList.add(uri.toString());
+                            URL urlConnection = null;
+                            HttpURLConnection connection;
+                            try {
+                                urlConnection = new URL(uri.toString());
+                                connection = (HttpURLConnection) urlConnection.openConnection();
+                                connection.setDoInput(true);
+                                connection.connect();
+                                InputStream input = connection.getInputStream();
+                                Bitmap imageBitmap = BitmapFactory.decodeStream(input);
+                                imageList.add(imageBitmap);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         });
                     }
                     // call recycler view stuff
@@ -152,7 +171,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             Intent photoRecyclerIntent = new Intent(getApplicationContext(), AllLocationPhotosActivity.class);
-            photoRecyclerIntent.putIntegerArrayListExtra("AllImages", (ArrayList<Integer>) imageList);
+            photoRecyclerIntent.putParcelableArrayListExtra("AllImages", (ArrayList<Bitmap>) imageList);
             startActivity(photoRecyclerIntent);
         }
     };
