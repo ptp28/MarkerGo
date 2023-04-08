@@ -54,6 +54,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private Button checkInButton;
 
     private Location currentLocation;
+    private Location markerLocation;
     private StorageReference storageRef;
     private StorageReference imagesRef;
 
@@ -78,11 +79,13 @@ public class LocationDetailsActivity extends AppCompatActivity {
         imageGridLayoutManager = new GridLayoutManager(this, 3);
         recyclerViewImages.setLayoutManager(imageGridLayoutManager);
 
-        if (bundle != null && bundle.containsKey("currentLocation")) {
+        if (bundle.containsKey("currentLocation")) {
             currentLocation = (Location) bundle.get("currentLocation");
         } else {
             imageList = new ArrayList<>();
         }
+
+        markerLocation = (Location) bundle.get("markerLocation");
 
         imageList = new ArrayList<>();
 
@@ -103,7 +106,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
         recyclerViewImages.setAdapter(recyclerViewAdapter);
         recyclerViewImages.setHasFixedSize(true);
 
-        checkInButton.setOnClickListener(checkInButtonListener);
         seeAllPhotosLinkTextView.setOnClickListener(openAllPhotosActivityListner);
         addPhotoTextView.setOnClickListener(addPhotosClickListener);
 
@@ -127,18 +129,14 @@ public class LocationDetailsActivity extends AppCompatActivity {
         descriptionTextView.setText(description);
     }
 
-    View.OnClickListener checkInButtonListener = new View.OnClickListener() {
-        private double latitude = 0;
-        private double longitude = 0;
-
-        private float[] distance = new float[10];
-//        Location.distanceBetween(this.currentLocation.getLatitude(), currentLocation.getLongitude(), this.latitude, this.longitude, distance);
-
-        @Override
-        public void onClick(View v) {
-            Toast.makeText(LocationDetailsActivity.this, "Check In", Toast.LENGTH_SHORT).show();
+    public void checkInToLocation(View view) {
+        float distance = currentLocation.distanceTo(markerLocation);
+        if (distance <= 100) {
+            Toast.makeText(getApplicationContext(), "check in success", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "failed. not within 100m", Toast.LENGTH_SHORT).show();
         }
-    };
+    }
 
     View.OnClickListener getDirectionsListener = new View.OnClickListener() {
         @Override
@@ -193,6 +191,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), imageBitmap, "Title", null);
                 file = Uri.parse(path);
             }
+
+            // call only if matches marker location details?
             uploadPhotoToDb(file);
         }
     }

@@ -67,7 +67,8 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     LocationRequest locationRequest;
     Marker currentLocationMarker;
 
-    Location currentLocation;
+    private Location currentLocation;
+    private Location markerLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int FINE_LOCATION_REQUEST_CODE = 10;
     private static final String TAG = "landingPage.java";
@@ -185,7 +186,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
 
     private void UpdateCurrentLocation() {
         Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
-        if(currentLocationMarker != null) {
+        if (currentLocationMarker != null) {
             currentLocationMarker.remove();
         }
         LatLng latLng = new LatLng(currentLocation.getLatitude(),
@@ -223,7 +224,13 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void openLocationDetails(Marker marker) {
+        LatLng latlng = marker.getPosition();
+        markerLocation = new Location("");
+        markerLocation.setLatitude(latlng.latitude);
+        markerLocation.setLongitude(latlng.longitude);
+
         Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
+        locationDetailsActivityIntent.putExtra("markerLocation", markerLocation);
         locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
         startActivity(locationDetailsActivityIntent);
     }

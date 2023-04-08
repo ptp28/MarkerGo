@@ -52,6 +52,19 @@ public class MainActivity extends AppCompatActivity {
     public void openLocationDetailsActivity(View view) {
         Intent intent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
         intent.putExtra("location", "placeholder");
+
+        // placeholder
+        Location cloc = new Location("");
+        cloc.setLatitude(42.3134789);
+        cloc.setLongitude(-71.109201);
+        intent.putExtra("currentLocation", cloc);
+
+        //placeholder
+        Location mloc = new Location("");
+        mloc.setLatitude(42.3134789);
+        mloc.setLongitude(-71.109201);
+        intent.putExtra("markerLocation", mloc);
+
         startActivity(intent);
     }
 
