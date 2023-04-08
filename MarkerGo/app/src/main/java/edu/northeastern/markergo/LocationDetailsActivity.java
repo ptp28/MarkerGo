@@ -69,22 +69,17 @@ public class LocationDetailsActivity extends AppCompatActivity {
         storageRef = FirebaseStorage.getInstance().getReference();
         imagesRef = storageRef.child(bundle.get("location") + "/");
 
-        descriptionTextView = (TextView) findViewById(R.id.textViewDescription);
-        getDirectionsButton = (Button) findViewById(R.id.buttonGetDirections);
-        seeAllPhotosLinkTextView = (TextView) findViewById(R.id.textViewAllPhotosLink);
-        addPhotoTextView = (TextView) findViewById(R.id.textViewAddPhoto);
-        checkInButton = (Button) findViewById(R.id.buttonCheckIn);
+        descriptionTextView = findViewById(R.id.textViewDescription);
+        getDirectionsButton = findViewById(R.id.buttonGetDirections);
+        seeAllPhotosLinkTextView = findViewById(R.id.textViewAllPhotosLink);
+        addPhotoTextView = findViewById(R.id.textViewAddPhoto);
+        checkInButton = findViewById(R.id.buttonCheckIn);
 
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
         imageGridLayoutManager = new GridLayoutManager(this, 3);
         recyclerViewImages.setLayoutManager(imageGridLayoutManager);
 
-        if (bundle.containsKey("currentLocation")) {
-            currentLocation = (Location) bundle.get("currentLocation");
-        } else {
-            imageList = new ArrayList<>();
-        }
-
+        currentLocation = (Location) bundle.get("currentLocation");
         markerLocation = (Location) bundle.get("markerLocation");
 
         imageList = new ArrayList<>();

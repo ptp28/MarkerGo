@@ -232,6 +232,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
         locationDetailsActivityIntent.putExtra("markerLocation", markerLocation);
         locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
+        locationDetailsActivityIntent.putExtra("location", marker.getTitle());
         startActivity(locationDetailsActivityIntent);
     }
 
