@@ -34,6 +34,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -139,13 +140,25 @@ public class LoginActivity extends AppCompatActivity {
         user = mAuth.getCurrentUser();
         assert user != null;
         String uid = user.getUid();
-        Map<String, String> data = new HashMap<>();
-        data.put("name", user.getDisplayName());
-        data.put("email", user.getProviderData().get(1).getEmail());
-        db.collection("users")
-                .document(uid)
-                .set(data)
-                .addOnCompleteListener(task -> displayToast(data.get("email")));
+
+        DocumentReference docRef = db.document("users/" + uid);
+        docRef.addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                Log.i("status", "Listen failed.", e);
+            } else if (snapshot != null && snapshot.exists()) {
+                Log.i("status", "document already in users");
+            } else {
+                Map<String, Object> data = new HashMap<>();
+                data.put("name", user.getDisplayName());
+                data.put("email", user.getProviderData().get(1).getEmail());
+                data.put("placesVisited", 0);
+
+                db.collection("users")
+                        .document(uid)
+                        .set(data, SetOptions.merge())
+                        .addOnCompleteListener(task -> Log.i("status", "added document to users"));
+            }
+        });
     }
 
     protected void displayToast(String text) {
