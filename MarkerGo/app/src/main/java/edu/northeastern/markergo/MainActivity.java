@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             }));
         }
 
-//        addMarkers();
+        addMarkers();
     }
 
     public void openLocationDetailsActivity(View view) {
@@ -69,50 +69,46 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(getApplicationContext(), UserProfileActivity.class));
     }
 
-//    private void addMarkers() {
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        InputStream is = getResources().openRawResource(R.raw.updated_places);
-//        BufferedReader reader = new BufferedReader(
-//                new InputStreamReader(is, StandardCharsets.UTF_8));
-//        String line = "";
-//
-//        try {
-//            reader.readLine();
-//            int cnt = 0;
-//            while ((line = reader.readLine()) != null) {
-//                cnt++;
-//                // Split the line into different tokens (using the comma as a separator).
-//                String[] entry = line.split(",");
-//
-//                Map<String, Object> data = new HashMap<>();
-//                data.put("name", entry[0]);
-//
-//                Location location = new Location("");
-//                location.setLatitude(Double.parseDouble(entry[1]));
-//                location.setLongitude(Double.parseDouble(entry[2]));
-//                data.put("location", location);
-//
-//                data.put("description", entry[3]);
-//
-//                Map<String, Integer> stats = new HashMap<>();
-//                stats.put("Morning", 0);
-//                stats.put("Afternoon", 0);
-//                stats.put("Evening", 0);
-//                stats.put("Night", 0);
-//                data.put("visitationStatsByTime", stats);
-//
-//                data.put("visitationsThisWeek", 0);
-//                data.put("photos", new ArrayList<>());
-//                data.put("addedBy", "sPevFgcG55cIUoWUIN85a0GzqV32");
-//
-//                int finalCnt = cnt;
-//                db.collection("markers")
-//                        .add(data)
-//                        .addOnCompleteListener(task -> Log.i("status", "done " + finalCnt));
-//            }
-//        } catch (IOException e1) {
-//            Log.e("MainActivity", "Error" + line, e1);
-//            e1.printStackTrace();
-//        }
-//    }
+    private void addMarkers() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        InputStream is = getResources().openRawResource(R.raw.updated_places);
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(is, StandardCharsets.UTF_8));
+        String line = "";
+
+        try {
+            reader.readLine();
+            int cnt = 0;
+            while ((line = reader.readLine()) != null) {
+                cnt++;
+                // Split the line into different tokens (using the comma as a separator).
+                String[] entry = line.split(",");
+
+                Map<String, Object> data = new HashMap<>();
+                data.put("name", entry[0]);
+                data.put("latitude", Double.parseDouble(entry[1]));
+                data.put("longitude", Double.parseDouble(entry[2]));
+                data.put("description", entry[3]);
+
+                Map<String, Integer> stats = new HashMap<>();
+                stats.put("Morning", 0);
+                stats.put("Afternoon", 0);
+                stats.put("Evening", 0);
+                stats.put("Night", 0);
+                data.put("visitationStatsByTime", stats);
+
+                data.put("visitationsThisWeek", 0);
+                data.put("photos", new ArrayList<>());
+                data.put("addedBy", "sPevFgcG55cIUoWUIN85a0GzqV32");
+
+                int finalCnt = cnt;
+                db.collection("markers")
+                        .add(data)
+                        .addOnCompleteListener(task -> Log.i("status", "done " + finalCnt));
+            }
+        } catch (IOException e1) {
+            Log.e("MainActivity", "Error" + line, e1);
+            e1.printStackTrace();
+        }
+    }
 }

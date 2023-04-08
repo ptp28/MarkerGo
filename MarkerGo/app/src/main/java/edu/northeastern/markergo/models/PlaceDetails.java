@@ -9,7 +9,8 @@ import java.util.Map;
 
 public class PlaceDetails {
     private final String name;
-    private final Location location;
+    private final double latitude;
+    private final double longitude;
     private final String description;
     private final Map<String, Integer> visitationStatsByTime;
     private final int visitationsThisWeek;
@@ -17,28 +18,31 @@ public class PlaceDetails {
 
     public PlaceDetails() {
         this.name = null;
-        this.location = null;
+        this.latitude = 0.0;
+        this.longitude = 0.0;
         this.description = null;
         this.visitationStatsByTime = new HashMap<>();
         this.visitationsThisWeek = 0;
         this.photos = new ArrayList<>();
     }
 
-    public PlaceDetails(String name, Location location, String description) {
+    public PlaceDetails(String name, double latitude, double longitude, String description) {
         this.name = name;
-        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.description = description;
         this.visitationStatsByTime = new HashMap<>();
         this.visitationsThisWeek = 0;
         this.photos = new ArrayList<>();
     }
 
-    public PlaceDetails(String name, Location location,
+    public PlaceDetails(String name, double latitude, double longitude,
                         String description,
                         Map<String, Integer> visitationStatsByTime,
                         int visitationsThisWeek, List<PhotoDetails> photos) {
         this.name = name;
-        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.description = description;
         this.visitationStatsByTime = visitationStatsByTime;
         this.visitationsThisWeek = visitationsThisWeek;
@@ -49,8 +53,12 @@ public class PlaceDetails {
         return name;
     }
 
-    public Location getLocation() {
-        return location;
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 
     public String getDescription() {
