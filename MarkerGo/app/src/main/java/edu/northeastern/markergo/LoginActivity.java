@@ -3,6 +3,7 @@ package edu.northeastern.markergo;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -21,11 +22,21 @@ import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -38,6 +49,7 @@ public class LoginActivity extends AppCompatActivity {
     private SignInClient oneTapClient;
     private BeginSignInRequest signInRequest;
     private ActivityResultLauncher<IntentSenderRequest> activityResultLauncher;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+        db = FirebaseFirestore.getInstance();
     }
 
     public void openSignupActivity(View view) {
@@ -114,14 +127,25 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        user = mAuth.getCurrentUser();
-                        assert user != null;
-                        displayToast(user.getProviderData().get(1).getEmail());
+                        addUserToDb();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     } else {
                         displayToast("Authentication failed");
                     }
                 });
+    }
+
+    private void addUserToDb() {
+        user = mAuth.getCurrentUser();
+        assert user != null;
+        String uid = user.getUid();
+        Map<String, String> data = new HashMap<>();
+        data.put("name", user.getDisplayName());
+        data.put("email", user.getProviderData().get(1).getEmail());
+        db.collection("users")
+                .document(uid)
+                .set(data)
+                .addOnCompleteListener(task -> displayToast(data.get("email")));
     }
 
     protected void displayToast(String text) {
