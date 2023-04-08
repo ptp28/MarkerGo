@@ -12,6 +12,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -89,9 +90,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
         markerLocation = (Location) bundle.get("markerLocation");
 
         imageList = new ArrayList<>();
-
-        populateImageList();
-
         imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.lake));
         imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
         imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.bridge));
@@ -102,6 +100,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
         imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort3));
         imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.tent));
         imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort4));
+
+        populateImageList();
         recyclerViewAdapter = new ImageRecyclerViewAdapter(imageList);
 
         recyclerViewImages.setAdapter(recyclerViewAdapter);
@@ -123,6 +123,10 @@ public class LocationDetailsActivity extends AppCompatActivity {
                             URL urlConnection = null;
                             HttpURLConnection connection;
                             try {
+                                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                                        .permitAll().build();
+                                StrictMode.setThreadPolicy(policy);
+
                                 urlConnection = new URL(uri.toString());
                                 connection = (HttpURLConnection) urlConnection.openConnection();
                                 connection.setDoInput(true);
@@ -135,7 +139,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
                             }
                         });
                     }
-                    // call recycler view stuff
                 });
     }
 
