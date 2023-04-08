@@ -43,11 +43,20 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class landingPage extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -61,15 +70,20 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int FINE_LOCATION_REQUEST_CODE = 10;
+    private static final String TAG = "landingPage.java";
     private GoogleMap googleMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
+
+    private FirebaseFirestore fireStoreDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
 
+        fireStoreDB = FirebaseFirestore.getInstance();
+        populateMarkers();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
@@ -156,10 +170,10 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             boolean success = this.googleMap.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.google_maps_style));
             if (!success) {
-                Log.e("GOOGLE_MAPS_ERROR", "Style parsing failed.");
+                Log.e(TAG, "Style parsing failed.");
             }
         } catch (Resources.NotFoundException e) {
-            Log.e("GOOGLE_MAPS_ERROR", "Can't find style. Error: ", e);
+            Log.e(TAG, "Can't find style. Error: ", e);
         }
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -212,5 +226,36 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
         locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
         startActivity(locationDetailsActivityIntent);
+    }
+
+    public void populateMarkers() {
+        CollectionReference collectionReference = fireStoreDB.collection("markers");
+        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+                    if (!documentSnapshots.isEmpty()) {
+                        documentSnapshots.forEach(new Consumer<DocumentSnapshot>() {
+                            @Override
+                            public void accept(DocumentSnapshot documentSnapshot) {
+                                Log.d(TAG, String.valueOf(documentSnapshot.get("description")));
+                                Map<String, Object> locationMap = (Map<String, Object>) documentSnapshot.get("location");
+
+
+                                LatLng latLng = new LatLng((Double) locationMap.get("latitude"), (Double) locationMap.get("longitude"));
+                                MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+                                        .title((String) documentSnapshot.get("name"));
+                                googleMap.addMarker(markerOptions);
+                            }
+                        });
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 }
