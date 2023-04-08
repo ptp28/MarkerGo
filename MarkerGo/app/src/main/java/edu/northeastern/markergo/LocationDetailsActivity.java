@@ -5,11 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +33,7 @@ import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -177,37 +180,44 @@ public class LocationDetailsActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Toast.makeText(this, "Image picked", Toast.LENGTH_SHORT).show();
 
-            Uri file = data.getData();
-            StorageReference ref = imagesRef.child(file.getLastPathSegment());
-            UploadTask uploadTask = ref.putFile(file);
-            uploadTask.addOnSuccessListener(taskSnapshot -> {
-                        Log.i("status", "upload successful");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.i("status", "upload failed");
-                    });
-            uploadTask.continueWithTask(task -> {
-                        if (task.isSuccessful()) {
-                            return ref.getDownloadUrl();
-                        } else {
-                            throw Objects.requireNonNull(task.getException());
-                        }
-                    })
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Uri uri = task.getResult();
-                            // imageList.add(uri.toString());
-                            // refresh recycler view
-                        } else {
-                            Log.i("status", "failed to get download url");
-                        }
-                    });
-
-        } else {
-            Log.i("reqCode", Integer.toString(requestCode));
-            Log.i("resCode", Integer.toString(resultCode));
-            Log.i("data null?", Boolean.toString(data == null));
-//            Log.i("getData null?", Boolean.toString(data.getData() == null));
+            Uri file;
+            if (data.getData() != null) {
+                file = data.getData();
+            } else {
+                Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), imageBitmap, "Title", null);
+                file = Uri.parse(path);
+            }
+            uploadPhotoToDb(file);
         }
+    }
+
+    private void uploadPhotoToDb(Uri file) {
+        StorageReference ref = imagesRef.child(file.getLastPathSegment());
+        UploadTask uploadTask = ref.putFile(file);
+        uploadTask.addOnSuccessListener(taskSnapshot -> {
+                    Log.i("status", "upload successful");
+                })
+                .addOnFailureListener(e -> {
+                    Log.i("status", "upload failed");
+                });
+        uploadTask.continueWithTask(task -> {
+                    if (task.isSuccessful()) {
+                        return ref.getDownloadUrl();
+                    } else {
+                        throw Objects.requireNonNull(task.getException());
+                    }
+                })
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Uri uri = task.getResult();
+                        // imageList.add(uri.toString());
+                        // refresh recycler view
+                    } else {
+                        Log.i("status", "failed to get download url");
+                    }
+                });
     }
 }
