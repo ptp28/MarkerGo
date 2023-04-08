@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -22,6 +23,13 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +47,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private Button checkInButton;
 
     private Location currentLocation;
+    private StorageReference storageRef;
+    private StorageReference imagesRef;
 
     public static final int PICK_IMAGE_REQUEST_CODE = 1;
 
@@ -46,6 +56,10 @@ public class LocationDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_details);
+
+        Bundle bundle = getIntent().getExtras();
+        storageRef = FirebaseStorage.getInstance().getReference();
+        imagesRef = storageRef.child(bundle.get("location") + "/");
 
         descriptionTextView = (TextView) findViewById(R.id.textViewDescription);
         getDirectionsButton = (Button) findViewById(R.id.buttonGetDirections);
@@ -57,7 +71,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
         imageGridLayoutManager = new GridLayoutManager(this, 3);
         recyclerViewImages.setLayoutManager(imageGridLayoutManager);
 
-        Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("currentLocation")) {
             currentLocation = (Location) bundle.get("currentLocation");
         } else {
@@ -65,6 +78,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
         }
 
         imageList = new ArrayList<>();
+
+        populateImageList();
+
         imageList.add(R.drawable.lake);
         imageList.add(R.drawable.fort);
         imageList.add(R.drawable.bridge);
@@ -85,6 +101,19 @@ public class LocationDetailsActivity extends AppCompatActivity {
         addPhotoTextView.setOnClickListener(addPhotosClickListener);
 
         getDirectionsButton.setOnClickListener(getDirectionsListener);
+    }
+
+    private void populateImageList() {
+        imagesRef.listAll()
+                .addOnSuccessListener(listResult -> {
+                    for (StorageReference ref : listResult.getItems()) {
+                        ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                            Log.i("idk", uri.toString());
+                            // imageList.add(uri.toString());
+                        });
+                    }
+                    // call recycler view stuff
+                });
     }
 
     private void setDescription(String description) {
@@ -144,8 +173,23 @@ public class LocationDetailsActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST_CODE) {
+        if (requestCode == PICK_IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Toast.makeText(this, "Image picked", Toast.LENGTH_SHORT).show();
+
+            Uri file = data.getData();
+            imagesRef.child(file.getLastPathSegment())
+                    .putFile(file)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        Log.i("status", "upload successful");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.i("status", "upload failed");
+                    });
+        } else {
+            Log.i("reqCode", Integer.toString(requestCode));
+            Log.i("resCode", Integer.toString(resultCode));
+            Log.i("data null?", Boolean.toString(data == null));
+//            Log.i("getData null?", Boolean.toString(data.getData() == null));
         }
     }
 }

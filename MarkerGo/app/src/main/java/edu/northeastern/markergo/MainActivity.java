@@ -50,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openLocationDetailsActivity(View view) {
-        startActivity(new Intent(getApplicationContext(), LocationDetailsActivity.class));
+        Intent intent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
+        intent.putExtra("location", "placeholder");
+        startActivity(intent);
     }
 
     public void openLoginActivity(View view) {
