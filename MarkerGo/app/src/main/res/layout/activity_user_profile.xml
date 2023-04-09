@@ -29,7 +29,9 @@
                     android:id="@+id/userDP"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/default_user" />
+                    android:src="@drawable/default_user"
+                    android:onClick="updateUserDP" />
+
             </androidx.cardview.widget.CardView>
 
             <TextView
