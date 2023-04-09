@@ -2,13 +2,9 @@ package edu.northeastern.markergo;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,25 +12,16 @@ import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
-import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -42,11 +29,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import edu.northeastern.markergo.models.PlaceDetails;
 
 public class LocationDetailsActivity extends AppCompatActivity {
 
@@ -55,13 +43,15 @@ public class LocationDetailsActivity extends AppCompatActivity {
     ImageRecyclerViewAdapter recyclerViewAdapter;
     List<Bitmap> imageList;
     private TextView descriptionTextView;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+    private ImageView appbarCoverImage;
     private TextView seeAllPhotosLinkTextView;
     private TextView addPhotoTextView;
     private Button getDirectionsButton;
     private Button checkInButton;
 
     private Location currentLocation;
-    private Location markerLocation;
+    private PlaceDetails markerDetails;
     private StorageReference storageRef;
     private StorageReference imagesRef;
 
@@ -72,11 +62,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_details);
 
-        Bundle bundle = getIntent().getExtras();
-        storageRef = FirebaseStorage.getInstance().getReference();
-        imagesRef = storageRef.child(bundle.get("location") + "/");
-
         descriptionTextView = findViewById(R.id.textViewDescription);
+        collapsingToolbarLayout = findViewById(R.id.CollapsingToolbarLayout);
+        appbarCoverImage = findViewById(R.id.app_bar_image);
         getDirectionsButton = findViewById(R.id.buttonGetDirections);
         seeAllPhotosLinkTextView = findViewById(R.id.textViewAllPhotosLink);
         addPhotoTextView = findViewById(R.id.textViewAddPhoto);
@@ -85,32 +73,39 @@ public class LocationDetailsActivity extends AppCompatActivity {
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
         imageGridLayoutManager = new GridLayoutManager(this, 3);
         recyclerViewImages.setLayoutManager(imageGridLayoutManager);
-
-        currentLocation = (Location) bundle.get("currentLocation");
-        markerLocation = (Location) bundle.get("markerLocation");
-
-        imageList = new ArrayList<>();
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.lake));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.bridge));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort1));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.monastery));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort2));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.palace));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort3));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.tent));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort4));
-
-        populateImageList();
-        recyclerViewAdapter = new ImageRecyclerViewAdapter(imageList);
-
-        recyclerViewImages.setAdapter(recyclerViewAdapter);
         recyclerViewImages.setHasFixedSize(true);
 
         seeAllPhotosLinkTextView.setOnClickListener(openAllPhotosActivityListner);
         addPhotoTextView.setOnClickListener(addPhotosClickListener);
 
         getDirectionsButton.setOnClickListener(getDirectionsListener);
+
+
+        storageRef = FirebaseStorage.getInstance().getReference();
+        Bundle bundle = getIntent().getExtras();
+        if (bundle.containsKey("markerDetails")) {
+            markerDetails = (PlaceDetails) bundle.get("markerDetails");
+            imagesRef = storageRef.child(markerDetails.getName() + "/");
+            this.setDescription(markerDetails.getDescription());
+            this.setToolbarTitle(markerDetails.getName());
+        } else {
+            //TODO: What if marker not passed
+            markerDetails = new PlaceDetails();
+            imagesRef = storageRef.child("dummy-does-not-exist-name/");
+        }
+        if (bundle.containsKey("currentLocation")) {
+            currentLocation = (Location) bundle.get("currentLocation");
+        } else {
+            //TODO: if currentLocation not passed
+            currentLocation = new Location("");
+        }
+
+        imageList = new ArrayList<>();
+        recyclerViewAdapter = new ImageRecyclerViewAdapter(imageList);
+        recyclerViewImages.setAdapter(recyclerViewAdapter);
+
+
+        populateImageList();
     }
 
     private void populateImageList() {
@@ -134,6 +129,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
                                 InputStream input = connection.getInputStream();
                                 Bitmap imageBitmap = BitmapFactory.decodeStream(input);
                                 imageList.add(imageBitmap);
+                                recyclerViewAdapter.notifyItemInserted(imageList.size());
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -146,9 +142,18 @@ public class LocationDetailsActivity extends AppCompatActivity {
         descriptionTextView.setText(description);
     }
 
+    private void setToolbarTitle(String name) {
+        this.collapsingToolbarLayout.setTitle(name);
+    }
+
+    private void setToolbarImage(Bitmap image) {
+        this.appbarCoverImage.setImageBitmap(image);
+    }
+
     public void checkInToLocation(View view) {
-        float distance = currentLocation.distanceTo(markerLocation);
-        if (distance <= 100) {
+        float result[] = new float[4];
+        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), markerDetails.getLatitude(), markerDetails.getLongitude(), result);
+        if (result[0] <= 100) {
             Toast.makeText(getApplicationContext(), "check in success", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getApplicationContext(), "failed. not within 100m", Toast.LENGTH_SHORT).show();
@@ -169,7 +174,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             Intent photoRecyclerIntent = new Intent(getApplicationContext(), AllLocationPhotosActivity.class);
-            photoRecyclerIntent.putParcelableArrayListExtra("AllImages", (ArrayList<Bitmap>) imageList);
             startActivity(photoRecyclerIntent);
         }
     };

@@ -19,6 +19,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
@@ -58,6 +59,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import edu.northeastern.markergo.models.PlaceDetails;
+
 public class landingPage extends AppCompatActivity implements OnMapReadyCallback {
 
     public DrawerLayout drawerLayout;
@@ -75,8 +78,8 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap googleMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
-
     private FirebaseFirestore fireStoreDB;
+    private List<PlaceDetails> markerDetailsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +87,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_landing_page);
 
         fireStoreDB = FirebaseFirestore.getInstance();
+        markerDetailsList = new ArrayList<>();
         populateMarkers();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -204,7 +208,11 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(@NonNull Marker marker) {
-                openLocationDetails(marker);
+                if (marker.equals(currentLocationMarker)) {
+                    Toast.makeText(landingPage.this, "Glad to see you here", Toast.LENGTH_SHORT).show();
+                } else {
+                    openLocationDetails(marker);
+                }
             }
         });
         UiSettings uiSettings = googleMap.getUiSettings();
@@ -224,15 +232,9 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void openLocationDetails(Marker marker) {
-        LatLng latlng = marker.getPosition();
-        markerLocation = new Location("");
-        markerLocation.setLatitude(latlng.latitude);
-        markerLocation.setLongitude(latlng.longitude);
-
         Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
-        locationDetailsActivityIntent.putExtra("markerLocation", markerLocation);
         locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
-        locationDetailsActivityIntent.putExtra("location", marker.getTitle());
+        locationDetailsActivityIntent.putExtra("markerDetails", (Parcelable) marker.getTag());
         startActivity(locationDetailsActivityIntent);
     }
 
@@ -247,13 +249,19 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                         documentSnapshots.forEach(new Consumer<DocumentSnapshot>() {
                             @Override
                             public void accept(DocumentSnapshot documentSnapshot) {
-                                Log.d(TAG, String.valueOf(documentSnapshot.get("description")));
-
-
-                                LatLng latLng = new LatLng((Double) documentSnapshot.get("latitude"), (Double) documentSnapshot.get("longitude"));
+                                Log.d(TAG, String.valueOf(documentSnapshot.get("name")));
+                                PlaceDetails markerDetails = new PlaceDetails(
+                                        String.valueOf(documentSnapshot.get("name")),
+                                        (Double) documentSnapshot.get("latitude"),
+                                        (Double) documentSnapshot.get("longitude"),
+                                        (String) documentSnapshot.get("description")
+                                );
+                                markerDetailsList.add(markerDetails);
+                                LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
                                 MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                                        .title((String) documentSnapshot.get("name"));
-                                googleMap.addMarker(markerOptions);
+                                        .title(markerDetails.getName());
+                                Marker marker = googleMap.addMarker(markerOptions);
+                                marker.setTag(markerDetails);
                             }
                         });
                     } else {
