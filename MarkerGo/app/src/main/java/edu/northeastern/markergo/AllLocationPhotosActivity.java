@@ -28,7 +28,7 @@ public class AllLocationPhotosActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null && bundle.containsKey("AllImages")) {
-            imageList = bundle.getParcelableArrayList("AllImages");
+            imageList = (List<Bitmap>) bundle.getSerializable("AllImages");
         }
         else {
             imageList = new ArrayList<>();

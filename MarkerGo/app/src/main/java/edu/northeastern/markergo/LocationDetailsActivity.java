@@ -38,6 +38,7 @@ import com.google.firestore.v1.WriteResult;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -213,6 +214,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             Intent photoRecyclerIntent = new Intent(getApplicationContext(), AllLocationPhotosActivity.class);
+            photoRecyclerIntent.putExtra("AllImages", (Serializable) imageList);
             startActivity(photoRecyclerIntent);
         }
     };
