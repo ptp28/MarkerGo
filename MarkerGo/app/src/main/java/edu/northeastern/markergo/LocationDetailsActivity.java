@@ -140,30 +140,14 @@ public class LocationDetailsActivity extends AppCompatActivity {
         imagesRef.listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference ref : listResult.getItems()) {
-                        ref.getDownloadUrl().addOnSuccessListener(uri -> {
-                            Log.i("idk", uri.toString());
-                            // imageList.add(uri.toString());
-                            URL urlConnection = null;
-                            HttpURLConnection connection;
-                            try {
-                                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                                        .permitAll().build();
-                                StrictMode.setThreadPolicy(policy);
-
-                                urlConnection = new URL(uri.toString());
-                                connection = (HttpURLConnection) urlConnection.openConnection();
-                                connection.setDoInput(true);
-                                connection.connect();
-                                InputStream input = connection.getInputStream();
-                                Bitmap imageBitmap = BitmapFactory.decodeStream(input);
-                                imageList.add(imageBitmap);
-                                recyclerViewAdapter.notifyItemInserted(imageList.size());
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
+                        ref.getDownloadUrl().addOnSuccessListener(this::addToImageList);
                     }
                 });
+    }
+
+    private void addToImageList(Uri uri) {
+        Thread addToImageList = new Thread(new UrlToBitmap(uri.toString()));
+        addToImageList.start();
     }
 
     private void setDescription(String description) {
@@ -296,11 +280,35 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Uri uri = task.getResult();
-                        // imageList.add(uri.toString());
-                        // refresh recycler view
+                        addToImageList(uri);
                     } else {
                         Log.i("status", "failed to get download url");
                     }
                 });
+    }
+
+    private class UrlToBitmap implements Runnable {
+        URL url;
+
+        UrlToBitmap(String link) {
+            try {
+                this.url = new URL(link);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void run() {
+            try {
+                Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                runOnUiThread(() -> {
+                    imageList.add(image);
+                    recyclerViewAdapter.notifyItemInserted(imageList.size());
+                });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
