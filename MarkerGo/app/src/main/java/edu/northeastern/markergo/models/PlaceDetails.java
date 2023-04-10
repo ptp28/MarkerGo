@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PlaceDetails implements Parcelable {
+    private final String id;
     private final String name;
     private final double latitude;
     private final double longitude;
@@ -22,6 +23,7 @@ public class PlaceDetails implements Parcelable {
     private final List<PhotoDetails> photos;
 
     public PlaceDetails() {
+        this.id = null;
         this.name = null;
         this.latitude = 0.0;
         this.longitude = 0.0;
@@ -32,6 +34,7 @@ public class PlaceDetails implements Parcelable {
     }
 
     protected PlaceDetails(Parcel in) {
+        this.id = in.readString();
         this.name = in.readString();
         this.description = in.readString();
         this.latitude = in.readDouble();
@@ -41,7 +44,8 @@ public class PlaceDetails implements Parcelable {
         this.visitationsThisWeek = in.readInt();
     }
 
-    public PlaceDetails(String name, double latitude, double longitude, String description) {
+    public PlaceDetails(String id, String name, double latitude, double longitude, String description) {
+        this.id = id;
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -63,10 +67,11 @@ public class PlaceDetails implements Parcelable {
         }
     };
 
-    public PlaceDetails(String name, double latitude, double longitude,
+    public PlaceDetails(String id, String name, double latitude, double longitude,
                         String description,
                         Map<String, Integer> visitationStatsByTime,
                         int visitationsThisWeek, List<PhotoDetails> photos) {
+        this.id = id;
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -74,6 +79,10 @@ public class PlaceDetails implements Parcelable {
         this.visitationStatsByTime = visitationStatsByTime;
         this.visitationsThisWeek = visitationsThisWeek;
         this.photos = photos;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {
@@ -111,6 +120,7 @@ public class PlaceDetails implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(this.id);
         dest.writeString(this.name);
         dest.writeString(this.description);
         dest.writeDouble(this.latitude);

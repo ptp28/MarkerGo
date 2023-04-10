@@ -251,6 +251,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                             public void accept(DocumentSnapshot documentSnapshot) {
                                 Log.d(TAG, String.valueOf(documentSnapshot.get("name")));
                                 PlaceDetails markerDetails = new PlaceDetails(
+                                        documentSnapshot.getId(),
                                         String.valueOf(documentSnapshot.get("name")),
                                         (Double) documentSnapshot.get("latitude"),
                                         (Double) documentSnapshot.get("longitude"),

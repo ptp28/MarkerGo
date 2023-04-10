@@ -20,10 +20,20 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.firestore.v1.WriteResult;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +41,11 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import edu.northeastern.markergo.models.PlaceDetails;
@@ -54,6 +68,12 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private PlaceDetails markerDetails;
     private StorageReference storageRef;
     private StorageReference imagesRef;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private FirebaseFirestore db;
+    private CollectionReference usersCollectionRef;
+    private CollectionReference markersCollectionRef;
+    private Calendar calendar;
 
     public static final int PICK_IMAGE_REQUEST_CODE = 1;
 
@@ -61,6 +81,14 @@ public class LocationDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_details);
+
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        calendar = Calendar.getInstance();
+
+        db = FirebaseFirestore.getInstance();
+        markersCollectionRef = db.collection("markers");
+        usersCollectionRef = db.collection("users");
 
         descriptionTextView = findViewById(R.id.textViewDescription);
         collapsingToolbarLayout = findViewById(R.id.CollapsingToolbarLayout);
@@ -151,13 +179,40 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     public void checkInToLocation(View view) {
-        float result[] = new float[4];
+        float[] result = new float[4];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), markerDetails.getLatitude(), markerDetails.getLongitude(), result);
         if (result[0] <= 100) {
-            Toast.makeText(getApplicationContext(), "check in success", Toast.LENGTH_SHORT).show();
+            updateVisitationStatsForMarker();
+            updateCheckInForUser();
         } else {
             Toast.makeText(getApplicationContext(), "failed. not within 100m", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void updateVisitationStatsForMarker() {
+        DocumentReference markerRef = markersCollectionRef.document(markerDetails.getId());
+        String field = "visitationStatsByTime." + getSubfield();
+
+        markerRef.update(field, FieldValue.increment(1))
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(getApplicationContext(), "updated visitationStatsByTime", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> Log.i("status", "failed to update visitationStats"));
+    }
+
+    private String getSubfield() {
+        int timeOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+        return timeOfDay < 12 ? "Morning" : (timeOfDay < 16 ? "Afternoon" : (timeOfDay < 21 ? "Evening" : "Night"));
+    }
+
+    private void updateCheckInForUser() {
+        DocumentReference userRef = usersCollectionRef.document(user.getUid());
+
+        userRef.update("placesVisited", FieldValue.arrayUnion(markerDetails.getId()))
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(getApplicationContext(), "checked-in on firebase", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> Log.i("status", "failed to check-in on firebase"));
     }
 
     View.OnClickListener getDirectionsListener = new View.OnClickListener() {
