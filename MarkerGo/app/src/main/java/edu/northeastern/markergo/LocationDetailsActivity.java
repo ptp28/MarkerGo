@@ -211,12 +211,12 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
     private void updateCheckInForUser() {
         DocumentReference userRef = usersCollectionRef.document(user.getUid());
-
         userRef.update("placesVisited", FieldValue.arrayUnion(markerDetails.getId()))
                 .addOnSuccessListener(unused -> {
                     Toast.makeText(getApplicationContext(), "checked-in on firebase", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> Log.i("status", "failed to check-in on firebase"));
+        userRef.update("points", FieldValue.increment(100));
     }
 
     View.OnClickListener getDirectionsListener = new View.OnClickListener() {
