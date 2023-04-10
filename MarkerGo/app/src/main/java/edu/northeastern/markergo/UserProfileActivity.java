@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 
+import edu.northeastern.markergo.utils.UrlToBitmap;
+
 public class UserProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -81,8 +83,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 photoUrl += "?type=large&access_token=" + token;
                 Log.i("url", photoUrl);
             }
-            Thread setUserDP = new Thread(new UrlToBitmap(photoUrl));
-            setUserDP.start();
+            setUserDpBitmap(photoUrl);
         }
     }
 
@@ -154,33 +155,22 @@ public class UserProfileActivity extends AppCompatActivity {
                 .setPhotoUri(photoUri)
                 .build();
         user.updateProfile(profileUpdates)
-                .addOnSuccessListener(unused -> {
-                    Thread setUserDP = new Thread(new UrlToBitmap(photoUri.toString()));
-                    setUserDP.start();
-                })
+                .addOnSuccessListener(unused -> setUserDpBitmap(photoUri.toString()))
                 .addOnFailureListener(e -> Log.i("photoUri", "not updated"));
     }
 
-    private class UrlToBitmap implements Runnable {
-        URL url;
-
-        UrlToBitmap(String photoUrl) {
-            try {
-                this.url = new URL(photoUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void run() {
-            Log.i("idk", "on thread");
-            try {
-                Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                runOnUiThread(() -> userDP.setImageBitmap(image));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    private void setUserDpBitmap(String link) {
+        UrlToBitmap whatever = new UrlToBitmap(link);
+        Thread thread = new Thread(whatever);
+        thread.start();
+        try {
+            thread.join();
+            Bitmap image = whatever.getImageBitmap();
+            userDP.setImageBitmap(image);
+            Log.i("done", "done");
+        } catch (InterruptedException e) {
+            Log.i("not done", "done");
+            throw new RuntimeException(e);
         }
     }
 

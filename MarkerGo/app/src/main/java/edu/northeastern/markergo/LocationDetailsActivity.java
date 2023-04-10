@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import edu.northeastern.markergo.models.PlaceDetails;
+import edu.northeastern.markergo.utils.UrlToBitmap;
 
 public class LocationDetailsActivity extends AppCompatActivity {
 
@@ -143,11 +144,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
                         ref.getDownloadUrl().addOnSuccessListener(this::addToImageList);
                     }
                 });
-    }
-
-    private void addToImageList(Uri uri) {
-        Thread addToImageList = new Thread(new UrlToBitmap(uri.toString()));
-        addToImageList.start();
     }
 
     private void setDescription(String description) {
@@ -287,28 +283,17 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 });
     }
 
-    private class UrlToBitmap implements Runnable {
-        URL url;
-
-        UrlToBitmap(String link) {
-            try {
-                this.url = new URL(link);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void run() {
-            try {
-                Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                runOnUiThread(() -> {
-                    imageList.add(image);
-                    recyclerViewAdapter.notifyItemInserted(imageList.size());
-                });
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    private void addToImageList(Uri uri) {
+        UrlToBitmap whatever = new UrlToBitmap(uri.toString());
+        Thread thread = new Thread(whatever);
+        thread.start();
+        try {
+            thread.join();
+            Bitmap image = whatever.getImageBitmap();
+            imageList.add(image);
+            recyclerViewAdapter.notifyItemInserted(imageList.size());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }
