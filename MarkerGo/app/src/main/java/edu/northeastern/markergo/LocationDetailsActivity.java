@@ -182,8 +182,12 @@ public class LocationDetailsActivity extends AppCompatActivity {
         float[] result = new float[4];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), markerDetails.getLatitude(), markerDetails.getLongitude(), result);
         if (result[0] <= 100) {
-            updateVisitationStatsForMarker();
-            updateCheckInForUser();
+            if (user != null) {
+                updateVisitationStatsForMarker();
+                updateCheckInForUser();
+            } else {
+                Toast.makeText(getApplicationContext(), "sign in to update stuff on firebase", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(getApplicationContext(), "failed. not within 100m", Toast.LENGTH_SHORT).show();
         }
