@@ -3,6 +3,7 @@ package edu.northeastern.markergo;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -101,7 +102,11 @@ public class LocationDetailsActivity extends AppCompatActivity {
         checkInButton = findViewById(R.id.buttonCheckIn);
 
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
-        imageGridLayoutManager = new GridLayoutManager(this, 3);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            imageGridLayoutManager = new GridLayoutManager(this, 3);
+        } else {
+            imageGridLayoutManager = new GridLayoutManager(this, 6);
+        }
         recyclerViewImages.setLayoutManager(imageGridLayoutManager);
         recyclerViewImages.setHasFixedSize(true);
 
@@ -139,6 +144,12 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     private void populateImageList() {
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
+        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
         imagesRef.listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference ref : listResult.getItems()) {

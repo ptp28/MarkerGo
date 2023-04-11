@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
@@ -23,7 +24,11 @@ public class AllLocationPhotosActivity extends AppCompatActivity {
         setContentView(R.layout.activity_all_location_photos);
 
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
-        imageGridLayoutManager = new GridLayoutManager(this, 3);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            imageGridLayoutManager = new GridLayoutManager(this, 3);
+        } else {
+            imageGridLayoutManager = new GridLayoutManager(this, 6);
+        }
         recyclerViewImages.setLayoutManager(imageGridLayoutManager);
 
         Bundle bundle = getIntent().getExtras();
