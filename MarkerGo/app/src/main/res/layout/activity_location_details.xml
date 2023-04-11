@@ -16,6 +16,7 @@
             android:fitsSystemWindows="true">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/CollapsingToolbarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:collapsedTitleTextColor="@color/white"
@@ -33,9 +34,9 @@
                     android:layout_height="200dp"
 
                     android:scaleType="centerCrop"
-                    android:src="@drawable/fort"
-                    app:srcCompat="@drawable/fort"
-                    tools:srcCompat="@drawable/fort" />
+                    android:src="@drawable/lake"
+                    app:srcCompat="@drawable/lake"
+                    tools:srcCompat="@drawable/lake" />
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"

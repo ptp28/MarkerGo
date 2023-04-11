@@ -6,23 +6,24 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.Parcelable;
 import android.provider.Settings;
-import android.view.GestureDetector;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -34,19 +35,33 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
-public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import edu.northeastern.markergo.models.PlaceDetails;
+
+public class landingPage extends AppCompatActivity implements OnMapReadyCallback {
 
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
@@ -54,19 +69,26 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     public double longitude;
     LocationRequest locationRequest;
     Marker currentLocationMarker;
-    GestureDetector gestureDetector;
-    Location currentLocation;
+
+    private Location currentLocation;
+    private Location markerLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int FINE_LOCATION_REQUEST_CODE = 10;
+    private static final String TAG = "landingPage.java";
     private GoogleMap googleMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
-//    private GoogleMap myMap;
-    
+    private FirebaseFirestore fireStoreDB;
+    private List<PlaceDetails> markerDetailsList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
+
+        fireStoreDB = FirebaseFirestore.getInstance();
+        markerDetailsList = new ArrayList<>();
+        populateMarkers();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
@@ -77,8 +99,8 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             }
         };
         askRequiredLocationPermissions();
-        FragmentManager myFragmentManager = getSupportFragmentManager();
-        SupportMapFragment mapFragment = (SupportMapFragment) myFragmentManager
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -147,28 +169,54 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        googleMap.setOnMapLongClickListener(this);
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = this.googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.google_maps_style));
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            askRequiredLocationPermissions();
+            return;
+        }
+        this.googleMap.setMyLocationEnabled(true);
     }
 
     private void UpdateCurrentLocation() {
         Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
-        if(currentLocationMarker != null) {
+        if (currentLocationMarker != null) {
             currentLocationMarker.remove();
         }
         LatLng latLng = new LatLng(currentLocation.getLatitude(),
                 currentLocation.getLongitude());
+
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.user_marker, getTheme());
+        Bitmap userMarker = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 100, 156, false);
+
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                .title("Here I am!");
+                .title("{{User Name}}")
+                .icon(BitmapDescriptorFactory.fromBitmap(userMarker));
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
         currentLocationMarker = googleMap.addMarker(markerOptions);
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 7));
-//        googleMap.addMarker(markerOptions);
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(@NonNull Marker marker) {
+                if (marker.equals(currentLocationMarker)) {
+                    Toast.makeText(landingPage.this, "Glad to see you here", Toast.LENGTH_SHORT).show();
+                } else {
+                    openLocationDetails(marker);
+                }
+            }
+        });
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
-        uiSettings.setCompassEnabled(true);
-        uiSettings.setAllGesturesEnabled(true);
-        uiSettings.setMapToolbarEnabled(true);
     }
 
     @Override
@@ -183,36 +231,47 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    @Override
-    public void onMapLongClick(LatLng point) {
-        AlertDialog.Builder build = new AlertDialog.Builder(this);
-        build.setTitle("New Location Add");
-        build.setMessage("Do you wanna request addition of a new location?")
-                .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent=new Intent(landingPage.this, newLocation.class);
-                        startActivity(intent);
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                });
-        AlertDialog alertDialog = build.create();
-        alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-        int width = (int) (getResources().getDisplayMetrics().widthPixels*0.7);
-        int height = (int) (getResources().getDisplayMetrics().heightPixels*0.32);
-        alertDialog.getWindow().setLayout(width,height);
-
+    public void openLocationDetails(Marker marker) {
+        Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
+        locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
+        locationDetailsActivityIntent.putExtra("markerDetails", (Parcelable) marker.getTag());
+        startActivity(locationDetailsActivityIntent);
     }
 
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-        super.onPointerCaptureChanged(hasCapture);
+    public void populateMarkers() {
+        CollectionReference collectionReference = fireStoreDB.collection("markers");
+        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+                    if (!documentSnapshots.isEmpty()) {
+                        documentSnapshots.forEach(new Consumer<DocumentSnapshot>() {
+                            @Override
+                            public void accept(DocumentSnapshot documentSnapshot) {
+                                Log.d(TAG, String.valueOf(documentSnapshot.get("name")));
+                                PlaceDetails markerDetails = new PlaceDetails(
+                                        documentSnapshot.getId(),
+                                        String.valueOf(documentSnapshot.get("name")),
+                                        (Double) documentSnapshot.get("latitude"),
+                                        (Double) documentSnapshot.get("longitude"),
+                                        (String) documentSnapshot.get("description")
+                                );
+                                markerDetailsList.add(markerDetails);
+                                LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
+                                MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+                                        .title(markerDetails.getName());
+                                Marker marker = googleMap.addMarker(markerOptions);
+                                marker.setTag(markerDetails);
+                            }
+                        });
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 }

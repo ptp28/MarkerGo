@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ public class AllLocationPhotosActivity extends AppCompatActivity {
     private RecyclerView recyclerViewImages;
     RecyclerView.LayoutManager imageGridLayoutManager;
     ImageRecyclerViewAdapter recyclerViewAdapter;
-    List<Integer> imageList;
+    List<Bitmap> imageList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,12 +24,16 @@ public class AllLocationPhotosActivity extends AppCompatActivity {
         setContentView(R.layout.activity_all_location_photos);
 
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
-        imageGridLayoutManager = new GridLayoutManager(this, 3);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            imageGridLayoutManager = new GridLayoutManager(this, 3);
+        } else {
+            imageGridLayoutManager = new GridLayoutManager(this, 6);
+        }
         recyclerViewImages.setLayoutManager(imageGridLayoutManager);
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null && bundle.containsKey("AllImages")) {
-            imageList = bundle.getIntegerArrayList("AllImages");
+            imageList = (List<Bitmap>) bundle.getSerializable("AllImages");
         }
         else {
             imageList = new ArrayList<>();

@@ -3,6 +3,7 @@ package edu.northeastern.markergo;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -21,9 +22,9 @@ import java.util.List;
 
 public class ImageRecyclerViewAdapter extends RecyclerView.Adapter<ImageRecyclerViewAdapter.ImageViewHolder> {
 
-    List<Integer> imageList;
+    List<Bitmap> imageList;
 
-    public ImageRecyclerViewAdapter(List<Integer> imageList) {
+    public ImageRecyclerViewAdapter(List<Bitmap> imageList) {
         this.imageList = imageList;
     }
 
@@ -37,7 +38,7 @@ public class ImageRecyclerViewAdapter extends RecyclerView.Adapter<ImageRecycler
 
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
-        holder.imageView.setImageResource(imageList.get(position));
+        holder.imageView.setImageBitmap(imageList.get(position));
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

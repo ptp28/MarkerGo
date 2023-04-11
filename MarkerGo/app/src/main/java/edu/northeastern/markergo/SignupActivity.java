@@ -2,6 +2,7 @@ package edu.northeastern.markergo;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -69,6 +70,7 @@ public class SignupActivity extends AppCompatActivity {
             mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
                     addNameToUserprofile(name);
+                    displayToast("Signup successful");
                 } else {
                     displayToast("Account with this email exists already!");
                 }
@@ -85,6 +87,7 @@ public class SignupActivity extends AppCompatActivity {
         user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 displayToast("Account created successfully!");
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
             } else {
                 displayToast("Error in updating user profile");
             }
