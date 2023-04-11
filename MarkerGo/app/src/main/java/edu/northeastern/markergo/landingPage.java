@@ -61,7 +61,7 @@ import java.util.function.Consumer;
 
 import edu.northeastern.markergo.models.PlaceDetails;
 
-public class landingPage extends AppCompatActivity implements OnMapReadyCallback {
+public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
@@ -217,6 +217,9 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         });
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setCompassEnabled(true);
+        uiSettings.setAllGesturesEnabled(true);
+        uiSettings.setMapToolbarEnabled(true);
     }
 
     @Override
@@ -229,6 +232,34 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onMapLongClick(LatLng point) {
+        AlertDialog.Builder build = new AlertDialog.Builder(this);
+        build.setTitle("New Location Add");
+        build.setMessage("Do you wanna request addition of a new location?")
+                .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent=new Intent(landingPage.this, newLocation.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        AlertDialog alertDialog = build.create();
+        alertDialog.show();
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        int width = (int) (getResources().getDisplayMetrics().widthPixels*0.7);
+        int height = (int) (getResources().getDisplayMetrics().heightPixels*0.32);
+        alertDialog.getWindow().setLayout(width,height);
+
     }
 
     public void openLocationDetails(Marker marker) {
