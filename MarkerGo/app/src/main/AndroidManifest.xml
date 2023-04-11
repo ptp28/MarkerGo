@@ -77,6 +77,10 @@
             android:configChanges="orientation|screenSize"
             android:exported="false" />
         <activity
+            android:name=".EditUserProfileActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

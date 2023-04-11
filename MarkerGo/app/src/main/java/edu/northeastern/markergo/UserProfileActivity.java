@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +38,9 @@ import edu.northeastern.markergo.utils.UrlToBitmap;
 public class UserProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-    private TextView usernameTV;
+    private TextView username;
+    private LinearLayout phoneLayout;
+    private TextView phone;
     private ImageView userDP;
     private TextView email;
     private static int PICK_IMAGE_REQUEST_CODE = 1;
@@ -53,27 +56,38 @@ public class UserProfileActivity extends AppCompatActivity {
         storageRef = FirebaseStorage.getInstance().getReference();
         imagesRef = storageRef.child("customUserPhotos/");
 
-        usernameTV = findViewById(R.id.username);
+        username = findViewById(R.id.username);
         userDP = findViewById(R.id.userDP);
         email = findViewById(R.id.email);
+        phone = findViewById(R.id.phone);
+        phoneLayout = findViewById(R.id.phoneLayout);
+
         setUserDetails();
 
 
-//        logUserDetails();
     }
 
     private void setUserDetails() {
         user = mAuth.getCurrentUser();
         assert user != null;
 
-        usernameTV.setText(user.getDisplayName());
+        username.setText(user.getDisplayName());
         email.setText(user.getProviderData().get(1).getEmail());
+        if(user.getProviderData().get(1).getPhoneNumber() == null) {
+            phoneLayout.setVisibility(View.INVISIBLE);
+        } else {
+            phone.setText(user.getProviderData().get(1).getPhoneNumber());
+            phoneLayout.setVisibility(View.VISIBLE);
+        }
 
         String photoUrl = String.valueOf(user.getPhotoUrl());
         setUserDP(photoUrl);
 
-        System.out.println("Email = " + user.getProviderData().get(1).getEmail());
+        System.out.println("Provider = " + user.getProviderData());
         System.out.println("Name = " + user.getDisplayName());
+
+
+        System.out.println("Phone = " + user.getProviderData().get(1).getPhoneNumber());
     }
 
     private void setUserDP(String photoUrl) {
@@ -174,8 +188,9 @@ public class UserProfileActivity extends AppCompatActivity {
         }
     }
 
-//    private void logUserDetails() {
-//        FirebaseUser user = mAuth.getCurrentUser();
-//        Log.i("USER", user.getEmail());
-//    }
+
+    public void startEditUserActivity(View view) {
+        startActivity(new Intent(getApplicationContext(), EditUserProfileActivity.class));
+    }
+
 }

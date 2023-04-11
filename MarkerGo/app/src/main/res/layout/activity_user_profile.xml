@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F6F5F5"
     android:orientation="vertical"
-    android:background="#F6F5F5">
+    android:visibility="visible">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -15,7 +16,16 @@
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:background="#2196F3"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <ImageButton
+                android:onClick="startEditUserActivity"
+                android:id="@+id/imageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:baselineAlignBottom="false"
+                app:srcCompat="@android:drawable/ic_menu_edit" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="140dp"
@@ -29,8 +39,8 @@
                     android:id="@+id/userDP"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/default_user"
-                    android:onClick="updateUserDP" />
+                    android:onClick="updateUserDP"
+                    android:src="@drawable/default_user" />
 
             </androidx.cardview.widget.CardView>
 
@@ -50,77 +60,87 @@
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_centerHorizontal="true"
             app:cardCornerRadius="5dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:weightSum="3"
                 android:orientation="horizontal"
-                android:padding="10dp">
+                android:padding="10dp"
+                android:weightSum="3">
+
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Markers Placed"
-                        android:textSize="17dp"
-                        android:textColor="#000"/>
+                        android:textColor="#000"
+                        android:textSize="17dp" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="1000K+"
-                        android:textSize="27dp"
                         android:textColor="#2196F3"
-                        android:textStyle="bold"/>
+                        android:textSize="27dp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Likes"
-                        android:textSize="17dp"
-                        android:textColor="#000"/>
+                        android:textColor="#000"
+                        android:textSize="17dp" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="500K+"
-                        android:textSize="27dp"
                         android:textColor="#2196F3"
-                        android:textStyle="bold"/>
+                        android:textSize="27dp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Shares"
-                        android:textSize="17dp"
-                        android:textColor="#000"/>
+                        android:textColor="#000"
+                        android:textSize="17dp" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="33.1K+"
-                        android:textSize="27dp"
                         android:textColor="#2196F3"
-                        android:textStyle="bold"/>
+                        android:textSize="27dp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
@@ -135,11 +155,12 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
         android:layout_marginTop="20dp"
+        android:layout_marginRight="30dp"
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/emailLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -168,6 +189,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/phoneLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -181,68 +203,10 @@
                 android:textSize="13sp" />
 
             <TextView
+                android:id="@+id/phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
-                android:text="+1-202-555-0157"
-                android:textColor="#000000"
-                android:textSize="18sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="15dp"
-                android:background="@color/gray_400" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Twitter"
-                android:textColor="@color/black"
-                android:textSize="13sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
-                android:text="string 1"
-                android:textColor="#000000"
-                android:textSize="18sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="15dp"
-                android:background="@color/gray_400" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Facebook"
-                android:textColor="@color/black"
-                android:textSize="13sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
-                android:text="facebook.com/joeytrib"
                 android:textColor="#000000"
                 android:textSize="18sp" />
 
@@ -260,10 +224,10 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Follow me"
         android:layout_gravity="center_horizontal"
-        android:textSize="18dp"
-        android:layout_marginTop="15dp"/>
+        android:layout_marginTop="15dp"
+        android:text="Follow me"
+        android:textSize="18dp" />
 
 
 </LinearLayout>
