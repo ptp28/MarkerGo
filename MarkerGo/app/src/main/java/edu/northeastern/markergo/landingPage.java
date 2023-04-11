@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.content.Context;
@@ -16,9 +17,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -30,6 +34,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
@@ -41,7 +46,7 @@ import com.google.android.gms.tasks.Task;
 
 import org.jetbrains.annotations.NotNull;
 
-public class landingPage extends AppCompatActivity implements OnMapReadyCallback {
+public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
@@ -49,19 +54,19 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     public double longitude;
     LocationRequest locationRequest;
     Marker currentLocationMarker;
-
+    GestureDetector gestureDetector;
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int FINE_LOCATION_REQUEST_CODE = 10;
     private GoogleMap googleMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
-
+//    private GoogleMap myMap;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
-
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
@@ -72,8 +77,8 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             }
         };
         askRequiredLocationPermissions();
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        FragmentManager myFragmentManager = getSupportFragmentManager();
+        SupportMapFragment mapFragment = (SupportMapFragment) myFragmentManager
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -142,6 +147,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
+        googleMap.setOnMapLongClickListener(this);
     }
 
     private void UpdateCurrentLocation() {
@@ -157,9 +163,12 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5));
         currentLocationMarker = googleMap.addMarker(markerOptions);
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 7));
-        googleMap.addMarker(markerOptions);
+//        googleMap.addMarker(markerOptions);
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setCompassEnabled(true);
+        uiSettings.setAllGesturesEnabled(true);
+        uiSettings.setMapToolbarEnabled(true);
     }
 
     @Override
@@ -174,4 +183,36 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    public void onMapLongClick(LatLng point) {
+        AlertDialog.Builder build = new AlertDialog.Builder(this);
+        build.setTitle("New Location Add");
+        build.setMessage("Do you wanna request addition of a new location?")
+                .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent=new Intent(landingPage.this, newLocation.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        AlertDialog alertDialog = build.create();
+        alertDialog.show();
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        int width = (int) (getResources().getDisplayMetrics().widthPixels*0.7);
+        int height = (int) (getResources().getDisplayMetrics().heightPixels*0.32);
+        alertDialog.getWindow().setLayout(width,height);
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
+    }
 }

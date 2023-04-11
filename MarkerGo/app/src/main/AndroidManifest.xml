@@ -19,6 +19,13 @@
         android:theme="@style/Theme.MarkerGo"
         tools:targetApi="31">
         <activity
+            android:name=".newLocation"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".AllLocationPhotosActivity"
             android:exported="false" />
         <activity
