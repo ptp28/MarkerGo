@@ -71,16 +71,16 @@ public class EditUserProfileActivity extends AppCompatActivity {
                 "email", emailInput.getText().toString(),
                 "phone", phoneInput.getText().toString()
                 ).addOnSuccessListener(task -> {
+                    user.updateEmail(emailInput.getText().toString());
+
                     Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
 
                     Toast.makeText(getApplicationContext(),"User update successfully", Toast.LENGTH_SHORT).show();
                 });
-
-
         //update user profile
-        //user.updateEmail(String.valueOf(emailInput.getText()));
+        //
 
 
     }
