@@ -19,7 +19,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
@@ -42,27 +41,33 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import edu.northeastern.markergo.models.PlaceDetails;
 
 public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
-
+    // maker colour change
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private CollectionReference usersCollectionRef;
+    //
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
     public double latitude;
     public double longitude;
     LocationRequest locationRequest;
     Marker currentLocationMarker;
-
     private Location currentLocation;
     private Location markerLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -82,6 +87,13 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_landing_page);
 
         fireStoreDB = FirebaseFirestore.getInstance();
+
+        // maker colour change
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        usersCollectionRef = fireStoreDB.collection("users");
+        //
+
         markersRef = fireStoreDB.collection("markers");
         markerDetailsList = new ArrayList<>();
         populateMarkers();
@@ -315,11 +327,44 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void setMarkerOnMap(PlaceDetails markerDetails) {
+        final MarkerOptions[] markerOptions = new MarkerOptions[1];
+        DocumentReference userRef;
         markerDetailsList.add(markerDetails);
         LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                .title(markerDetails.getName());
-        Marker marker = googleMap.addMarker(markerOptions);
-        marker.setTag(markerDetails);
+        if(user!=null) {
+            userRef = usersCollectionRef.document(user.getUid());
+            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            ArrayList currentUserVisited = (ArrayList) document.getData().get("placesVisited");
+                            if (currentUserVisited.contains(markerDetails.getId())) {
+                                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAA");
+                                markerOptions[0] = new MarkerOptions().position(latLng)
+                                        .title(markerDetails.getName())
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                                Marker marker = googleMap.addMarker(markerOptions[0]);
+                                marker.setTag(markerDetails);
+                            } else {
+                                markerOptions[0] = new MarkerOptions().position(latLng)
+                                        .title(markerDetails.getName());
+                                Marker marker = googleMap.addMarker(markerOptions[0]);
+                                marker.setTag(markerDetails);
+                            }
+                        } else {
+                        }
+                    } else {
+                    }
+                }
+            });
+        }
+        else {
+            markerOptions[0] = new MarkerOptions().position(latLng)
+                    .title(markerDetails.getName());
+            Marker marker = googleMap.addMarker(markerOptions[0]);
+            marker.setTag(markerDetails);
+        }
     }
 }
