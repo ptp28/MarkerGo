@@ -2,7 +2,9 @@ package edu.northeastern.markergo;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
@@ -20,9 +23,14 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import edu.northeastern.markergo.utils.UrlToBitmap;
@@ -35,6 +43,8 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private EditText usernameInput;
     private ImageView userDP;
     private Button updateProfileBtn;
+    private StorageReference storageRef;
+    private StorageReference imagesRef;
 
     private static int PICK_IMAGE_REQUEST_CODE = 1;
 
@@ -45,6 +55,8 @@ public class EditUserProfileActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        storageRef = FirebaseStorage.getInstance().getReference();
+        imagesRef = storageRef.child("customUserPhotos/");
 
         usernameInput = findViewById(R.id.usernameInput);
         usernameInput.setText(user.getDisplayName());
@@ -82,7 +94,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
     public void updateUserDP(View view) {
@@ -100,7 +111,8 @@ public class EditUserProfileActivity extends AppCompatActivity {
         startActivityForResult(chooserIntent, PICK_IMAGE_REQUEST_CODE);
     }
 
-    private void setUserDP(String photoUrl) {
+
+    public void setUserDP(String photoUrl) {
         if (!photoUrl.equals("null")) {
             if (user.getProviderData().get(1).getProviderId().equals("facebook.com")) {
                 String token = AccessToken.getCurrentAccessToken().getToken();
@@ -109,6 +121,63 @@ public class EditUserProfileActivity extends AppCompatActivity {
             }
             setUserDpBitmap(photoUrl);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Toast.makeText(this, "Image picked", Toast.LENGTH_SHORT).show();
+
+            Uri file;
+            if (data.getData() != null) {
+                file = data.getData();
+            } else {
+                Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), imageBitmap, "Title", null);
+                file = Uri.parse(path);
+            }
+
+            // call only if matches marker location details?
+            uploadPhotoToDb(file);
+        }
+    }
+
+    private void uploadPhotoToDb(Uri file) {
+        StorageReference ref = imagesRef.child(file.getLastPathSegment());
+        UploadTask uploadTask = ref.putFile(file);
+        uploadTask.addOnSuccessListener(taskSnapshot -> {
+                    Log.i("status", "upload successful");
+                })
+                .addOnFailureListener(e -> {
+                    Log.i("status", "upload failed");
+                });
+        uploadTask.continueWithTask(task -> {
+                    if (task.isSuccessful()) {
+                        return ref.getDownloadUrl();
+                    } else {
+                        throw Objects.requireNonNull(task.getException());
+                    }
+                })
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Uri uri = task.getResult();
+                        updateUserProfile(uri);
+                    } else {
+                        Log.i("status", "failed to get download url");
+                    }
+                });
+    }
+
+    private void updateUserProfile(Uri photoUri) {
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setPhotoUri(photoUri)
+                .build();
+        user.updateProfile(profileUpdates)
+                .addOnSuccessListener(unused -> setUserDpBitmap(photoUri.toString()))
+                .addOnFailureListener(e -> Log.i("photoUri", "not updated"));
     }
 
     private void setUserDpBitmap(String link) {

@@ -82,8 +82,6 @@ public class UserProfileActivity extends AppCompatActivity {
         System.out.println("Email = " + user.getEmail());
         System.out.println("Name = " + user.getDisplayName());
 
-//        System.out.println("Phone = " + user.getProviderData().get(1).getPhoneNumber());
-//        System.out.println("Phone" + user.getProviderData().get(1).getPhoneNumber().getClass());
     }
 
     private void setUserDP(String photoUrl) {
@@ -168,7 +166,6 @@ public class UserProfileActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
     }
-
 
     public void startEditUserActivity(View view) {
         startActivity(new Intent(getApplicationContext(), EditUserProfileActivity.class));
