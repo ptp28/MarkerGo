@@ -38,6 +38,8 @@
 
         </LinearLayout>
 
+
+
     </RelativeLayout>
 
     <LinearLayout
@@ -143,8 +145,19 @@
         </LinearLayout>
 
 
+        <Button
+            android:onClick="changePassword"
+            android:id="@+id/changePasswordBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:text="Update Profile"
+            android:textSize="18dp" />
+
 
     </LinearLayout>
+
 
     <Button
         android:onClick="updateUserProfile"
