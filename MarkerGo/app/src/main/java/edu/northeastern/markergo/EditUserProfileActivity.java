@@ -33,7 +33,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
     private EditText usernameInput;
     private EditText phoneInput;
-    private EditText emailInput;
     private ImageView userDP;
     private Button updateProfileBtn;
 
@@ -51,8 +50,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
         usernameInput.setText(user.getDisplayName());
         phoneInput = findViewById(R.id.phoneInput);
         phoneInput.setText(user.getProviderData().get(1).getPhoneNumber());
-        emailInput = findViewById(R.id.emailInput);
-        emailInput.setText(user.getProviderData().get(1).getEmail());
         userDP = findViewById(R.id.userDP);
         String photoUrl = String.valueOf(user.getPhotoUrl());
         setUserDP(photoUrl);
@@ -68,10 +65,8 @@ public class EditUserProfileActivity extends AppCompatActivity {
         db.collection("users").document(uid)
                 .update(
                 "name", usernameInput.getText().toString(),
-                "email", emailInput.getText().toString(),
                 "phone", phoneInput.getText().toString()
                 ).addOnSuccessListener(task -> {
-                    user.updateEmail(emailInput.getText().toString());
 
                     Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -79,10 +74,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
                     Toast.makeText(getApplicationContext(),"User update successfully", Toast.LENGTH_SHORT).show();
                 });
-        //update user profile
-        //
-
-
     }
 
     public void updateUserDP(View view) {
