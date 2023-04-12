@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.facebook.AccessToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,7 +33,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private FirebaseUser user;
 
     private EditText usernameInput;
-    private EditText phoneInput;
     private ImageView userDP;
     private Button updateProfileBtn;
 
@@ -48,8 +48,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
         usernameInput = findViewById(R.id.usernameInput);
         usernameInput.setText(user.getDisplayName());
-        phoneInput = findViewById(R.id.phoneInput);
-        phoneInput.setText(user.getProviderData().get(1).getPhoneNumber());
         userDP = findViewById(R.id.userDP);
         String photoUrl = String.valueOf(user.getPhotoUrl());
         setUserDP(photoUrl);
@@ -62,18 +60,29 @@ public class EditUserProfileActivity extends AppCompatActivity {
         String uid = user.getUid();
         System.out.println("UID -> " + uid);
 
-        db.collection("users").document(uid)
-                .update(
-                "name", usernameInput.getText().toString(),
-                "phone", phoneInput.getText().toString()
-                ).addOnSuccessListener(task -> {
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(usernameInput.getText().toString())
+                .build();
+        assert user != null;
+        user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                db.collection("users").document(uid)
+                        .update(
+                                "name", usernameInput.getText().toString()
+                        ).addOnSuccessListener(task2 -> {
 
-                    Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                            Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
 
-                    Toast.makeText(getApplicationContext(),"User update successfully", Toast.LENGTH_SHORT).show();
-                });
+                            Toast.makeText(getApplicationContext(),"User update successfully", Toast.LENGTH_SHORT).show();
+                        });
+            } else {
+                Toast.makeText(getApplicationContext(), "Error in updating user profile", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     public void updateUserDP(View view) {
