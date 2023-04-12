@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -40,11 +41,16 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
 
-    private EditText usernameInput;
-    private ImageView userDP;
-    private Button updateProfileBtn;
     private StorageReference storageRef;
     private StorageReference imagesRef;
+
+    private EditText usernameInput;
+    private ImageView userDP;
+
+    private LinearLayout oldPasswordLayout;
+    private LinearLayout newPasswordLayout;
+    private EditText oldPasswordInput;
+    private EditText newPasswordInput;
 
     private static int PICK_IMAGE_REQUEST_CODE = 1;
 
@@ -58,14 +64,24 @@ public class EditUserProfileActivity extends AppCompatActivity {
         storageRef = FirebaseStorage.getInstance().getReference();
         imagesRef = storageRef.child("customUserPhotos/");
 
-        usernameInput = findViewById(R.id.usernameInput);
-        usernameInput.setText(user.getDisplayName());
         userDP = findViewById(R.id.userDP);
         String photoUrl = String.valueOf(user.getPhotoUrl());
         setUserDP(photoUrl);
 
+        usernameInput = findViewById(R.id.usernameInput);
+        usernameInput.setText(user.getDisplayName());
 
-        updateProfileBtn = findViewById(R.id.updateProfileBtn);
+        oldPasswordLayout = findViewById(R.id.oldPasswordLayout);
+        newPasswordLayout = findViewById(R.id.newPasswordLayout);
+        oldPasswordInput = findViewById(R.id.oldPasswordInput);
+        newPasswordInput = findViewById(R.id.newPasswordInput);
+
+        String providerType = user.getProviderData().get(1).getProviderId();
+        if(providerType.equals("google.com") || providerType.equals("facebook.com")) {
+            oldPasswordLayout.setVisibility(View.INVISIBLE);
+            newPasswordLayout.setVisibility(View.INVISIBLE);
+        }
+
     }
 
     public void updateUserProfile(View view) {

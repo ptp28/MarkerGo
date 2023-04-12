@@ -16,8 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -26,8 +24,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Objects;
 
 import edu.northeastern.markergo.utils.UrlToBitmap;
@@ -78,9 +74,8 @@ public class UserProfileActivity extends AppCompatActivity {
         String photoUrl = String.valueOf(user.getPhotoUrl());
         setUserDP(photoUrl);
 
-        System.out.println("Provider = " + user.getProviderData());
-        System.out.println("Email = " + user.getEmail());
-        System.out.println("Name = " + user.getDisplayName());
+        System.out.println("Provider ID = " + user.getProviderId());
+        System.out.println("Provider DATA = " + user.getProviderData().get(1).getProviderId()); //returns google.com or facebook.com
 
     }
 
