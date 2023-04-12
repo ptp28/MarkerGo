@@ -46,11 +46,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+//import com.google.firebase.firestore.CollectionReference;
+//import com.google.firebase.firestore.DocumentReference;
+//import com.google.firebase.firestore.DocumentSnapshot;
+//import com.google.firebase.firestore.FirebaseFirestore;
+//import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -78,7 +78,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap googleMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
-    private FirebaseFirestore fireStoreDB;
+//    private FirebaseFirestore fireStoreDB;
     private List<PlaceDetails> markerDetailsList;
 
     @Override
@@ -86,9 +86,9 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
 
-        fireStoreDB = FirebaseFirestore.getInstance();
+//        fireStoreDB = FirebaseFirestore.getInstance();
         markerDetailsList = new ArrayList<>();
-        populateMarkers();
+//        populateMarkers();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
@@ -215,6 +215,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         });
+        googleMap.setOnMapLongClickListener(this);
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
         uiSettings.setCompassEnabled(true);
@@ -269,40 +270,40 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         startActivity(locationDetailsActivityIntent);
     }
 
-    public void populateMarkers() {
-        CollectionReference collectionReference = fireStoreDB.collection("markers");
-        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                    if (!documentSnapshots.isEmpty()) {
-                        documentSnapshots.forEach(new Consumer<DocumentSnapshot>() {
-                            @Override
-                            public void accept(DocumentSnapshot documentSnapshot) {
-                                Log.d(TAG, String.valueOf(documentSnapshot.get("name")));
-                                PlaceDetails markerDetails = new PlaceDetails(
-                                        documentSnapshot.getId(),
-                                        String.valueOf(documentSnapshot.get("name")),
-                                        (Double) documentSnapshot.get("latitude"),
-                                        (Double) documentSnapshot.get("longitude"),
-                                        (String) documentSnapshot.get("description")
-                                );
-                                markerDetailsList.add(markerDetails);
-                                LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
-                                MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                                        .title(markerDetails.getName());
-                                Marker marker = googleMap.addMarker(markerOptions);
-                                marker.setTag(markerDetails);
-                            }
-                        });
-                    } else {
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
-    }
+//    public void populateMarkers() {
+//        CollectionReference collectionReference = fireStoreDB.collection("markers");
+//        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+//                    if (!documentSnapshots.isEmpty()) {
+//                        documentSnapshots.forEach(new Consumer<DocumentSnapshot>() {
+//                            @Override
+//                            public void accept(DocumentSnapshot documentSnapshot) {
+//                                Log.d(TAG, String.valueOf(documentSnapshot.get("name")));
+//                                PlaceDetails markerDetails = new PlaceDetails(
+//                                        documentSnapshot.getId(),
+//                                        String.valueOf(documentSnapshot.get("name")),
+//                                        (Double) documentSnapshot.get("latitude"),
+//                                        (Double) documentSnapshot.get("longitude"),
+//                                        (String) documentSnapshot.get("description")
+//                                );
+//                                markerDetailsList.add(markerDetails);
+//                                LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
+//                                MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+//                                        .title(markerDetails.getName());
+//                                Marker marker = googleMap.addMarker(markerOptions);
+//                                marker.setTag(markerDetails);
+//                            }
+//                        });
+//                    } else {
+//                        Log.d(TAG, "No such document");
+//                    }
+//                } else {
+//                    Log.d(TAG, "get failed with ", task.getException());
+//                }
+//            }
+//        });
+//    }
 }
