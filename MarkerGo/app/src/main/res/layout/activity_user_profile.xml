@@ -16,22 +16,23 @@
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:background="#2196F3"
+            android:gravity="end"
             android:orientation="vertical"
             android:visibility="visible">
 
             <ImageButton
-                android:onClick="startEditUserActivity"
                 android:id="@+id/imageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:baselineAlignBottom="false"
+                android:baselineAlignBottom="true"
+                android:onClick="startEditUserActivity"
                 app:srcCompat="@android:drawable/ic_menu_edit" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="140dp"
                 android:layout_height="140dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="35dp"
+                android:layout_marginTop="5dp"
                 android:foregroundGravity="center_horizontal"
                 app:cardCornerRadius="100dp">
 
@@ -39,7 +40,6 @@
                     android:id="@+id/userDP"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:onClick="updateUserDP"
                     android:src="@drawable/default_user" />
 
             </androidx.cardview.widget.CardView>

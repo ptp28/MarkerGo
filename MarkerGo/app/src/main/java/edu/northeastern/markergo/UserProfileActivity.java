@@ -63,8 +63,6 @@ public class UserProfileActivity extends AppCompatActivity {
         phoneLayout = findViewById(R.id.phoneLayout);
 
         setUserDetails();
-
-
     }
 
     private void setUserDetails() {
@@ -84,10 +82,12 @@ public class UserProfileActivity extends AppCompatActivity {
         setUserDP(photoUrl);
 
         System.out.println("Provider = " + user.getProviderData());
+        System.out.println("Email = " + user.getEmail());
         System.out.println("Name = " + user.getDisplayName());
 
 
-        System.out.println("Phone = " + user.getProviderData().get(1).getPhoneNumber());
+//        System.out.println("Phone = " + user.getProviderData().get(1).getPhoneNumber());
+//        System.out.println("Phone" + user.getProviderData().get(1).getPhoneNumber().getClass());
     }
 
     private void setUserDP(String photoUrl) {
@@ -99,21 +99,6 @@ public class UserProfileActivity extends AppCompatActivity {
             }
             setUserDpBitmap(photoUrl);
         }
-    }
-
-    public void updateUserDP(View view) {
-        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        getIntent.setType("image/*");
-
-        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        pickIntent.setType("image/*");
-
-        Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-
-        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent, captureIntent});
-
-        startActivityForResult(chooserIntent, PICK_IMAGE_REQUEST_CODE);
     }
 
     @Override
