@@ -74,6 +74,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int FINE_LOCATION_REQUEST_CODE = 10;
     private static final int ADD_MARKER_REQUEST_CODE = 100;
+    private static final int VISIT_MARKER_REQUEST_CODE = 200;
     private static final String TAG = "landingPage.java";
     private GoogleMap googleMap;
     private LocationManager locationManager;
@@ -287,11 +288,12 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             PlaceDetails markerDetails = (PlaceDetails) data.getExtras().get("markerDetails");
             System.out.println("id = " + markerDetails.getId());
             setMarkerOnMap(markerDetails);
-        } else if (requestCode == 200 & resultCode == RESULT_OK && data != null) {
+        } else if (requestCode == VISIT_MARKER_REQUEST_CODE & resultCode == RESULT_OK && data != null) {
             Bundle extras = data.getExtras();
             if ((Boolean) extras.get("checkedIn")) {
                 LatLng position = this.currMarker.getPosition();
                 this.currMarker.remove();
+                this.currMarker = null;
                 PlaceDetails markerDetails = (PlaceDetails) extras.get("markerDetails");
                 addGreenMarker(markerDetails, position);
             }
@@ -320,7 +322,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
         locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
         locationDetailsActivityIntent.putExtra("markerDetails", (Parcelable) marker.getTag());
-        startActivityForResult(locationDetailsActivityIntent, 200);
+        startActivityForResult(locationDetailsActivityIntent, VISIT_MARKER_REQUEST_CODE);
     }
 
     public void populateMarkers() {
