@@ -40,6 +40,7 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -79,7 +80,8 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private LocationListener locationListener;
     private FirebaseFirestore fireStoreDB;
     private List<PlaceDetails> markerDetailsList;
-    CollectionReference markersRef;
+    private Marker currMarker;
+    private CollectionReference markersRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -285,14 +287,40 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             PlaceDetails markerDetails = (PlaceDetails) data.getExtras().get("markerDetails");
             System.out.println("id = " + markerDetails.getId());
             setMarkerOnMap(markerDetails);
+        } else if (requestCode == 200 & resultCode == RESULT_OK && data != null) {
+            Bundle extras = data.getExtras();
+            if ((Boolean) extras.get("checkedIn")) {
+                LatLng position = this.currMarker.getPosition();
+                this.currMarker.remove();
+                PlaceDetails markerDetails = (PlaceDetails) extras.get("markerDetails");
+                addGreenMarker(markerDetails, position);
+            }
         }
     }
 
+    private void addGreenMarker(PlaceDetails markerDetails, LatLng position) {
+        final MarkerOptions[] markerOptions = new MarkerOptions[1];
+        markerOptions[0] = new MarkerOptions().position(position)
+                .title(markerDetails.getName())
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        Marker marker = googleMap.addMarker(markerOptions[0]);
+        marker.setTag(markerDetails);
+    }
+
+    private void addDefaultMarker(PlaceDetails markerDetails, LatLng position) {
+        final MarkerOptions[] markerOptions = new MarkerOptions[1];
+        markerOptions[0] = new MarkerOptions().position(position)
+                .title(markerDetails.getName());
+        Marker marker = googleMap.addMarker(markerOptions[0]);
+        marker.setTag(markerDetails);
+    }
+
     public void openLocationDetails(Marker marker) {
+        this.currMarker = marker;
         Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
         locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
         locationDetailsActivityIntent.putExtra("markerDetails", (Parcelable) marker.getTag());
-        startActivity(locationDetailsActivityIntent);
+        startActivityForResult(locationDetailsActivityIntent, 200);
     }
 
     public void populateMarkers() {
@@ -333,37 +361,19 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
         if (user != null) {
             userRef = usersCollectionRef.document(user.getUid());
-            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            ArrayList currentUserVisited = (ArrayList) document.getData().get("placesVisited");
-                            if (currentUserVisited != null && currentUserVisited.contains(markerDetails.getId())) {
-                                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAA");
-                                markerOptions[0] = new MarkerOptions().position(latLng)
-                                        .title(markerDetails.getName())
-                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                Marker marker = googleMap.addMarker(markerOptions[0]);
-                                marker.setTag(markerDetails);
-                            } else {
-                                markerOptions[0] = new MarkerOptions().position(latLng)
-                                        .title(markerDetails.getName());
-                                Marker marker = googleMap.addMarker(markerOptions[0]);
-                                marker.setTag(markerDetails);
-                            }
+
+            userRef.collection("placesVisited")
+                    .document(markerDetails.getId())
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+                        if (snapshot.exists()) {
+                            addGreenMarker(markerDetails, latLng);
                         } else {
+                            addDefaultMarker(markerDetails, latLng);
                         }
-                    } else {
-                    }
-                }
-            });
+                    });
         } else {
-            markerOptions[0] = new MarkerOptions().position(latLng)
-                    .title(markerDetails.getName());
-            Marker marker = googleMap.addMarker(markerOptions[0]);
-            marker.setTag(markerDetails);
+            addDefaultMarker(markerDetails, latLng);
         }
     }
 }

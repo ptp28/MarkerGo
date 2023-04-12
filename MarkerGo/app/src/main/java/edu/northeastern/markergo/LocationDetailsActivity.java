@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -40,8 +41,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -77,6 +80,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private CollectionReference usersCollectionRef;
     private CollectionReference markersCollectionRef;
     private Calendar calendar;
+    private boolean checkedIn = false;
 
     public static final int PICK_IMAGE_REQUEST_CODE = 1;
 
@@ -143,6 +147,15 @@ public class LocationDetailsActivity extends AppCompatActivity {
         populateImageList();
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra("checkedIn", checkedIn);
+        intent.putExtra("markerDetails", markerDetails);
+        setResult(RESULT_OK, intent);
+        super.onBackPressed();
+    }
+
     private void populateImageList() {
         imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
         imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
@@ -203,12 +216,19 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
     private void updateCheckInForUser() {
         DocumentReference userRef = usersCollectionRef.document(user.getUid());
-        userRef.update("placesVisited", FieldValue.arrayUnion(markerDetails.getId()))
+        DocumentReference placeRef = userRef.collection("placesVisited").document(markerDetails.getId());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("count", FieldValue.increment(1));
+        data.put("lastVisited", new Date().getTime());
+
+        placeRef.set(data, SetOptions.merge())
                 .addOnSuccessListener(unused -> {
+                    this.checkedIn = true;
                     Toast.makeText(getApplicationContext(), "checked-in on firebase", Toast.LENGTH_SHORT).show();
+                    userRef.update("points", FieldValue.increment(100));
                 })
                 .addOnFailureListener(e -> Log.i("status", "failed to check-in on firebase"));
-        userRef.update("points", FieldValue.increment(100));
     }
 
     View.OnClickListener getDirectionsListener = new View.OnClickListener() {
