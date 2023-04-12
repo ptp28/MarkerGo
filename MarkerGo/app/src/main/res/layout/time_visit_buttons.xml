@@ -19,7 +19,7 @@
             android:padding="10dp"
             android:text="Morning"
             android:textAlignment="center"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="16sp" />
 
         <TextView
@@ -28,7 +28,7 @@
             android:padding="10dp"
             android:text="100+"
             android:textAlignment="center"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:background="@drawable/time_visit_button_count_bg"
             android:textSize="14sp" />
 
@@ -47,7 +47,7 @@
             android:padding="10dp"
             android:text="Afternoon"
             android:textAlignment="center"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="16sp" />
 
         <TextView
@@ -56,7 +56,7 @@
             android:padding="10dp"
             android:text="100+"
             android:textAlignment="center"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:background="@drawable/time_visit_button_count_bg"
             android:textSize="14sp" />
 
@@ -75,7 +75,7 @@
             android:padding="10dp"
             android:text="Evening"
             android:textAlignment="center"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="16sp" />
 
         <TextView
@@ -84,7 +84,7 @@
             android:padding="10dp"
             android:text="100+"
             android:textAlignment="center"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:background="@drawable/time_visit_button_count_bg"
             android:textSize="14sp" />
 
@@ -103,7 +103,7 @@
             android:padding="10dp"
             android:text="Night"
             android:textAlignment="center"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="16sp" />
 
         <TextView
@@ -112,7 +112,7 @@
             android:padding="10dp"
             android:text="100+"
             android:textAlignment="center"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:background="@drawable/time_visit_button_count_bg"
             android:textSize="14sp" />
 
