@@ -81,21 +81,20 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/phoneLayout"
+            android:id="@+id/oldPasswordLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Phone"
+                android:text="Old Password"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
             <EditText
-                android:id="@+id/phoneInput"
+                android:id="@+id/oldPasswordInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
@@ -111,6 +110,39 @@
                 android:layout_marginTop="15dp" />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/newPasswordLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Password"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+
+            <EditText
+                android:id="@+id/newPasswordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:maxLines="1"
+                android:lines="1"
+                android:singleLine="true"
+                android:textColor="#000000"
+                android:textSize="18sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp" />
+
+        </LinearLayout>
+
+
 
     </LinearLayout>
 
