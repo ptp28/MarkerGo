@@ -1,6 +1,7 @@
 package edu.northeastern.markergo;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,21 +19,17 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,23 +37,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-//import com.google.firebase.firestore.CollectionReference;
-//import com.google.firebase.firestore.DocumentReference;
-//import com.google.firebase.firestore.DocumentSnapshot;
-//import com.google.firebase.firestore.FirebaseFirestore;
-//import com.google.firebase.firestore.QuerySnapshot;
-
-import org.jetbrains.annotations.NotNull;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import edu.northeastern.markergo.models.PlaceDetails;
@@ -74,21 +67,24 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private Location markerLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int FINE_LOCATION_REQUEST_CODE = 10;
+    private static final int ADD_MARKER_REQUEST_CODE = 100;
     private static final String TAG = "landingPage.java";
     private GoogleMap googleMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
-//    private FirebaseFirestore fireStoreDB;
+    private FirebaseFirestore fireStoreDB;
     private List<PlaceDetails> markerDetailsList;
+    CollectionReference markersRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
 
-//        fireStoreDB = FirebaseFirestore.getInstance();
+        fireStoreDB = FirebaseFirestore.getInstance();
+        markersRef = fireStoreDB.collection("markers");
         markerDetailsList = new ArrayList<>();
-//        populateMarkers();
+        populateMarkers();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
@@ -237,30 +233,47 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onMapLongClick(LatLng point) {
-        AlertDialog.Builder build = new AlertDialog.Builder(this);
-        build.setTitle("New Location Add");
-        build.setMessage("Do you wanna request addition of a new location?")
-                .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent=new Intent(landingPage.this, newLocation.class);
-                        startActivity(intent);
+        markersRef
+                .whereEqualTo("latitude", point.latitude)
+                .whereEqualTo("longitude", point.longitude)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot.getDocuments().size() != 0) {
+                        return;
                     }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                });
-        AlertDialog alertDialog = build.create();
-        alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-        int width = (int) (getResources().getDisplayMetrics().widthPixels*0.7);
-        int height = (int) (getResources().getDisplayMetrics().heightPixels*0.32);
-        alertDialog.getWindow().setLayout(width,height);
 
+                    AlertDialog.Builder build = new AlertDialog.Builder(this);
+                    build.setTitle("New Location Add");
+                    build.setMessage("Do you wanna request addition of a new location?")
+                            .setCancelable(false).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                Intent intent = new Intent(landingPage.this, newLocation.class);
+                                intent.putExtra("location", point);
+                                startActivityForResult(intent, ADD_MARKER_REQUEST_CODE);
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.cancel();
+                                }
+                            });
+                    AlertDialog alertDialog = build.create();
+                    alertDialog.show();
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                    int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.7);
+                    int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.32);
+                    alertDialog.getWindow().setLayout(width, height);
+                });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADD_MARKER_REQUEST_CODE & resultCode == RESULT_OK && data != null) {
+            PlaceDetails markerDetails = (PlaceDetails) data.getExtras().get("markerDetails");
+            System.out.println("id = " + markerDetails.getId());
+            setMarkerOnMap(markerDetails);
+        }
     }
 
     public void openLocationDetails(Marker marker) {
@@ -270,40 +283,43 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         startActivity(locationDetailsActivityIntent);
     }
 
-//    public void populateMarkers() {
-//        CollectionReference collectionReference = fireStoreDB.collection("markers");
-//        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-//                    if (!documentSnapshots.isEmpty()) {
-//                        documentSnapshots.forEach(new Consumer<DocumentSnapshot>() {
-//                            @Override
-//                            public void accept(DocumentSnapshot documentSnapshot) {
-//                                Log.d(TAG, String.valueOf(documentSnapshot.get("name")));
-//                                PlaceDetails markerDetails = new PlaceDetails(
-//                                        documentSnapshot.getId(),
-//                                        String.valueOf(documentSnapshot.get("name")),
-//                                        (Double) documentSnapshot.get("latitude"),
-//                                        (Double) documentSnapshot.get("longitude"),
-//                                        (String) documentSnapshot.get("description")
-//                                );
-//                                markerDetailsList.add(markerDetails);
-//                                LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
-//                                MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-//                                        .title(markerDetails.getName());
-//                                Marker marker = googleMap.addMarker(markerOptions);
-//                                marker.setTag(markerDetails);
-//                            }
-//                        });
-//                    } else {
-//                        Log.d(TAG, "No such document");
-//                    }
-//                } else {
-//                    Log.d(TAG, "get failed with ", task.getException());
-//                }
-//            }
-//        });
-//    }
+    public void populateMarkers() {
+        markersRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+                    if (!documentSnapshots.isEmpty()) {
+                        documentSnapshots.forEach(new Consumer<DocumentSnapshot>() {
+                            @Override
+                            public void accept(DocumentSnapshot documentSnapshot) {
+                                Log.d(TAG, String.valueOf(documentSnapshot.get("name")));
+                                PlaceDetails markerDetails = new PlaceDetails(
+                                        documentSnapshot.getId(),
+                                        String.valueOf(documentSnapshot.get("name")),
+                                        (Double) documentSnapshot.get("latitude"),
+                                        (Double) documentSnapshot.get("longitude"),
+                                        (String) documentSnapshot.get("description")
+                                );
+                                setMarkerOnMap(markerDetails);
+                            }
+                        });
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void setMarkerOnMap(PlaceDetails markerDetails) {
+        markerDetailsList.add(markerDetails);
+        LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
+        MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+                .title(markerDetails.getName());
+        Marker marker = googleMap.addMarker(markerOptions);
+        marker.setTag(markerDetails);
+    }
 }
