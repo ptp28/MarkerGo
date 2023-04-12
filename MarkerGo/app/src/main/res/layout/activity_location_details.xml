@@ -19,7 +19,7 @@
                 android:id="@+id/CollapsingToolbarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:collapsedTitleTextColor="@color/white"
+                app:collapsedTitleTextColor="?attr/colorOnPrimary"
                 app:contentScrim="?attr/colorPrimary"
                 app:expandedTitleTextColor="@color/white"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
