@@ -331,7 +331,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         DocumentReference userRef;
         markerDetailsList.add(markerDetails);
         LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
-        if(user!=null) {
+        if (user != null) {
             userRef = usersCollectionRef.document(user.getUid());
             userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
@@ -340,7 +340,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             ArrayList currentUserVisited = (ArrayList) document.getData().get("placesVisited");
-                            if (currentUserVisited.contains(markerDetails.getId())) {
+                            if (currentUserVisited != null && currentUserVisited.contains(markerDetails.getId())) {
                                 System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAA");
                                 markerOptions[0] = new MarkerOptions().position(latLng)
                                         .title(markerDetails.getName())
@@ -359,8 +359,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                     }
                 }
             });
-        }
-        else {
+        } else {
             markerOptions[0] = new MarkerOptions().position(latLng)
                     .title(markerDetails.getName());
             Marker marker = googleMap.addMarker(markerOptions[0]);
