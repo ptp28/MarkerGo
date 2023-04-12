@@ -67,6 +67,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private Location markerLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int FINE_LOCATION_REQUEST_CODE = 10;
+    private static final int ADD_MARKER_REQUEST_CODE = 100;
     private static final String TAG = "landingPage.java";
     private GoogleMap googleMap;
     private LocationManager locationManager;
@@ -244,13 +245,10 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                     AlertDialog.Builder build = new AlertDialog.Builder(this);
                     build.setTitle("New Location Add");
                     build.setMessage("Do you wanna request addition of a new location?")
-                            .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    Intent intent = new Intent(landingPage.this, newLocation.class);
-                                    intent.putExtra("location", point);
-                                    startActivityForResult(intent, 100);
-                                }
+                            .setCancelable(false).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                Intent intent = new Intent(landingPage.this, newLocation.class);
+                                intent.putExtra("location", point);
+                                startActivityForResult(intent, ADD_MARKER_REQUEST_CODE);
                             })
                             .setNegativeButton("No", new DialogInterface.OnClickListener() {
                                 @Override
@@ -271,7 +269,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 100 & resultCode == RESULT_OK && data != null) {
+        if (requestCode == ADD_MARKER_REQUEST_CODE & resultCode == RESULT_OK && data != null) {
             PlaceDetails markerDetails = (PlaceDetails) data.getExtras().get("markerDetails");
             System.out.println("id = " + markerDetails.getId());
             setMarkerOnMap(markerDetails);
