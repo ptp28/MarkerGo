@@ -8,16 +8,26 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import edu.northeastern.markergo.utils.UrlToBitmap;
 
 public class EditUserProfileActivity extends AppCompatActivity {
+    private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
 
@@ -33,6 +43,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_user_profile);
 
+        db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
@@ -50,15 +61,28 @@ public class EditUserProfileActivity extends AppCompatActivity {
         updateProfileBtn = findViewById(R.id.updateProfileBtn);
     }
 
-
-
     public void updateUserProfile(View view) {
-        //update user profile
-        user.updateEmail(String.valueOf(emailInput.getText()));
+        String uid = user.getUid();
+        System.out.println("UID -> " + uid);
 
-        Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        db.collection("users").document(uid)
+                .update(
+                "name", usernameInput.getText().toString(),
+                "email", emailInput.getText().toString(),
+                "phone", phoneInput.getText().toString()
+                ).addOnSuccessListener(task -> {
+                    Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+
+                    Toast.makeText(getApplicationContext(),"User update successfully", Toast.LENGTH_SHORT).show();
+                });
+
+
+        //update user profile
+        //user.updateEmail(String.valueOf(emailInput.getText()));
+
+
     }
 
     public void updateUserDP(View view) {

@@ -1,9 +1,7 @@
 package edu.northeastern.markergo;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -84,7 +81,6 @@ public class UserProfileActivity extends AppCompatActivity {
         System.out.println("Provider = " + user.getProviderData());
         System.out.println("Email = " + user.getEmail());
         System.out.println("Name = " + user.getDisplayName());
-
 
 //        System.out.println("Phone = " + user.getProviderData().get(1).getPhoneNumber());
 //        System.out.println("Phone" + user.getProviderData().get(1).getPhoneNumber().getClass());
