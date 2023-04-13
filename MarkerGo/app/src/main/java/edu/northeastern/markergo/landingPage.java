@@ -214,7 +214,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         Bitmap userMarker = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 100, 156, false);
 
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                .title("{{User Name}}")
+                .title(user.getDisplayName())
                 .icon(BitmapDescriptorFactory.fromBitmap(userMarker));
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
