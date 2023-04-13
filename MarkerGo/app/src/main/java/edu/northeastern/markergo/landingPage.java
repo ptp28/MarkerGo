@@ -53,9 +53,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import edu.northeastern.markergo.models.PlaceDetails;
+import edu.northeastern.markergo.models.VisitationDetails;
 
 public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
     // maker colour change
@@ -319,10 +322,32 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
 
     public void openLocationDetails(Marker marker) {
         this.currMarker = marker;
-        Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
-        locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
-        locationDetailsActivityIntent.putExtra("markerDetails", (Parcelable) marker.getTag());
-        startActivityForResult(locationDetailsActivityIntent, VISIT_MARKER_REQUEST_CODE);
+        PlaceDetails markerDetails = (PlaceDetails) marker.getTag();
+        System.out.println(markerDetails.getAddedBy());
+        assert markerDetails != null;
+        usersCollectionRef
+                .document(markerDetails.getAddedBy())
+                .collection("placesVisited")
+                .document(markerDetails.getId())
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
+                    locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
+                    locationDetailsActivityIntent.putExtra("markerDetails", markerDetails);
+
+                    if (documentSnapshot.exists()) {
+                        Map<String, Object> data = documentSnapshot.getData();
+                        System.out.println(data);
+                        assert data != null;
+                        int count = Integer.parseInt(Objects.requireNonNull(data.get("count")).toString());
+                        long lastVisited = Long.parseLong(Objects.requireNonNull(data.get("lastVisited")).toString());
+                        VisitationDetails visitationDetails = new VisitationDetails(count, lastVisited);
+                        locationDetailsActivityIntent.putExtra("visitationDetails", visitationDetails);
+                        System.out.println("added");
+                    }
+                    startActivityForResult(locationDetailsActivityIntent, VISIT_MARKER_REQUEST_CODE);
+                })
+                .addOnFailureListener(e -> Toast.makeText(getApplicationContext(), "something went wrong", Toast.LENGTH_SHORT).show());
     }
 
     public void populateMarkers() {
@@ -341,7 +366,8 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                                         String.valueOf(documentSnapshot.get("name")),
                                         (Double) documentSnapshot.get("latitude"),
                                         (Double) documentSnapshot.get("longitude"),
-                                        (String) documentSnapshot.get("description")
+                                        (String) documentSnapshot.get("description"),
+                                        (String) documentSnapshot.get("addedBy")
                                 );
                                 setMarkerOnMap(markerDetails);
                             }
@@ -357,7 +383,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void setMarkerOnMap(PlaceDetails markerDetails) {
-        final MarkerOptions[] markerOptions = new MarkerOptions[1];
         DocumentReference userRef;
         markerDetailsList.add(markerDetails);
         LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());

@@ -21,6 +21,7 @@ public class PlaceDetails implements Parcelable {
     private final Map<String, Integer> visitationStatsByTime;
     private final int visitationsThisWeek;
     private final List<PhotoDetails> photos;
+    private final String addedBy;
 
     public PlaceDetails() {
         this.id = null;
@@ -31,6 +32,7 @@ public class PlaceDetails implements Parcelable {
         this.visitationStatsByTime = new HashMap<>();
         this.visitationsThisWeek = 0;
         this.photos = new ArrayList<>();
+        this.addedBy = null;
     }
 
     protected PlaceDetails(Parcel in) {
@@ -42,9 +44,10 @@ public class PlaceDetails implements Parcelable {
         this.photos = (ArrayList<PhotoDetails>) in.readSerializable();
         this.visitationStatsByTime = (HashMap<String, Integer>) in.readSerializable();
         this.visitationsThisWeek = in.readInt();
+        this.addedBy = in.readString();
     }
 
-    public PlaceDetails(String id, String name, double latitude, double longitude, String description) {
+    public PlaceDetails(String id, String name, double latitude, double longitude, String description, String addedBy) {
         this.id = id;
         this.name = name;
         this.latitude = latitude;
@@ -53,6 +56,7 @@ public class PlaceDetails implements Parcelable {
         this.visitationStatsByTime = new HashMap<>();
         this.visitationsThisWeek = 0;
         this.photos = new ArrayList<>();
+        this.addedBy = addedBy;
     }
 
     public static final Creator<PlaceDetails> CREATOR = new Creator<PlaceDetails>() {
@@ -70,7 +74,7 @@ public class PlaceDetails implements Parcelable {
     public PlaceDetails(String id, String name, double latitude, double longitude,
                         String description,
                         Map<String, Integer> visitationStatsByTime,
-                        int visitationsThisWeek, List<PhotoDetails> photos) {
+                        int visitationsThisWeek, List<PhotoDetails> photos, String addedBy) {
         this.id = id;
         this.name = name;
         this.latitude = latitude;
@@ -79,6 +83,7 @@ public class PlaceDetails implements Parcelable {
         this.visitationStatsByTime = visitationStatsByTime;
         this.visitationsThisWeek = visitationsThisWeek;
         this.photos = photos;
+        this.addedBy = addedBy;
     }
 
     public String getId() {
@@ -113,6 +118,10 @@ public class PlaceDetails implements Parcelable {
         return photos;
     }
 
+    public String getAddedBy() {
+        return addedBy;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -127,6 +136,7 @@ public class PlaceDetails implements Parcelable {
         dest.writeDouble(this.longitude);
         dest.writeSerializable((Serializable) this.photos);
         dest.writeSerializable((Serializable) this.visitationStatsByTime);
-        dest.writeInt(visitationsThisWeek);
+        dest.writeInt(this.visitationsThisWeek);
+        dest.writeString(this.addedBy);
     }
 }

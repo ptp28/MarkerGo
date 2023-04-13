@@ -44,7 +44,11 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,8 +56,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import edu.northeastern.markergo.models.PlaceDetails;
+import edu.northeastern.markergo.models.VisitationDetails;
 import edu.northeastern.markergo.utils.UrlToBitmap;
 
 public class LocationDetailsActivity extends AppCompatActivity {
@@ -67,11 +73,13 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private ImageView appbarCoverImage;
     private TextView seeAllPhotosLinkTextView;
     private TextView addPhotoTextView;
+    private TextView lastVisitTextView;
     private Button getDirectionsButton;
     private Button checkInButton;
 
     private Location currentLocation;
     private PlaceDetails markerDetails;
+    private VisitationDetails visitationDetails;
     private StorageReference storageRef;
     private StorageReference imagesRef;
     private FirebaseAuth mAuth;
@@ -81,8 +89,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private CollectionReference markersCollectionRef;
     private Calendar calendar;
     private boolean checkedIn = false;
-
-    public static final int PICK_IMAGE_REQUEST_CODE = 1;
+    private static final int PICK_IMAGE_REQUEST_CODE = 1;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, MMM dd yyyy HH:mm");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +112,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         seeAllPhotosLinkTextView = findViewById(R.id.textViewAllPhotosLink);
         addPhotoTextView = findViewById(R.id.textViewAddPhoto);
         checkInButton = findViewById(R.id.buttonCheckIn);
+        lastVisitTextView = findViewById(R.id.textViewLastVisitLabel);
 
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -124,6 +133,15 @@ public class LocationDetailsActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (bundle.containsKey("markerDetails")) {
             markerDetails = (PlaceDetails) bundle.get("markerDetails");
+
+            if (bundle.containsKey("visitationDetails")) {
+                visitationDetails = (VisitationDetails) bundle.get("visitationDetails");
+                setLastVisitedText(visitationDetails.getLastVisited());
+            } else {
+                String text = "You have never visited this place.";
+                lastVisitTextView.setText(text);
+            }
+
             imagesRef = storageRef.child(markerDetails.getName() + "/");
             this.setDescription(markerDetails.getDescription());
             this.setToolbarTitle(markerDetails.getName());
@@ -203,9 +221,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
         String field = "visitationStatsByTime." + getSubfield();
 
         markerRef.update(field, FieldValue.increment(1))
-                .addOnSuccessListener(unused -> {
-                    Toast.makeText(getApplicationContext(), "updated visitationStatsByTime", Toast.LENGTH_SHORT).show();
-                })
                 .addOnFailureListener(e -> Log.i("status", "failed to update visitationStats"));
     }
 
@@ -220,12 +235,14 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
         Map<String, Object> data = new HashMap<>();
         data.put("count", FieldValue.increment(1));
-        data.put("lastVisited", new Date().getTime());
+        long lastVisited = new Date().getTime();
+        data.put("lastVisited", lastVisited);
 
         placeRef.set(data, SetOptions.merge())
                 .addOnSuccessListener(unused -> {
                     this.checkedIn = true;
-                    Toast.makeText(getApplicationContext(), "checked-in on firebase", Toast.LENGTH_SHORT).show();
+                    setLastVisitedText(lastVisited);
+                    Toast.makeText(getApplicationContext(), "Checked-in!", Toast.LENGTH_SHORT).show();
                     userRef.update("points", FieldValue.increment(100));
                 })
                 .addOnFailureListener(e -> Log.i("status", "failed to check-in on firebase"));
@@ -328,5 +345,11 @@ public class LocationDetailsActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void setLastVisitedText(long lastVisited) {
+        LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastVisited), TimeZone.getDefault().toZoneId());
+        String text = "You last visited this place on " + formatter.format(dateTime);
+        lastVisitTextView.setText(text);
     }
 }
