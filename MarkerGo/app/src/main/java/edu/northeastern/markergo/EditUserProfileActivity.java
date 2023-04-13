@@ -13,10 +13,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -82,6 +87,36 @@ public class EditUserProfileActivity extends AppCompatActivity {
             newPasswordLayout.setVisibility(View.INVISIBLE);
         }
 
+    }
+
+    public void changePassword(View view) {
+        AuthCredential credential = EmailAuthProvider
+                .getCredential(user.getEmail(), oldPasswordInput.getText().toString());
+
+        // Prompt the user to re-provide their sign-in credentials
+        user.reauthenticate(credential)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            user.updatePassword(newPasswordInput.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(getApplicationContext(), "Password changed successfully", Toast.LENGTH_SHORT).show();
+                                        Log.d("PASS CHANGE SUCCESS", "Password updated");
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "...???IDK", Toast.LENGTH_SHORT).show();
+                                        Log.d("PASS CHANGE ERROR", "Error password not updated");
+                                    }
+                                }
+                            });
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Password does not match our records", Toast.LENGTH_SHORT).show();
+                            Log.d("PASS CHANGE FAIL", "Error auth failed");
+                        }
+                    }
+                });
     }
 
     public void updateUserProfile(View view) {
