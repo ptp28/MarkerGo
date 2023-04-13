@@ -128,7 +128,7 @@
                             android:id="@+id/totalCheckIns"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="500K+"
+                            android:text="0"
                             android:textColor="?attr/colorSecondaryVariant"
                             android:textSize="27dp"
                             android:textStyle="bold" />
