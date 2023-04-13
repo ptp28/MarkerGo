@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.facebook.AccessToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,7 +33,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private FirebaseUser user;
 
     private EditText usernameInput;
-    private EditText phoneInput;
     private EditText emailInput;
     private ImageView userDP;
     private Button updateProfileBtn;
@@ -49,8 +49,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
         usernameInput = findViewById(R.id.usernameInput);
         usernameInput.setText(user.getDisplayName());
-        phoneInput = findViewById(R.id.phoneInput);
-        phoneInput.setText(user.getProviderData().get(1).getPhoneNumber());
         emailInput = findViewById(R.id.emailInput);
         emailInput.setText(user.getProviderData().get(1).getEmail());
         userDP = findViewById(R.id.userDP);
@@ -68,11 +66,11 @@ public class EditUserProfileActivity extends AppCompatActivity {
         db.collection("users").document(uid)
                 .update(
                 "name", usernameInput.getText().toString(),
-                "email", emailInput.getText().toString(),
-                "phone", phoneInput.getText().toString()
+                "email", emailInput.getText().toString()
                 ).addOnSuccessListener(task -> {
                     user.updateEmail(emailInput.getText().toString());
-
+                    user.updateProfile(new UserProfileChangeRequest.Builder().
+                            setDisplayName(usernameInput.getText().toString()).build());
                     Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);

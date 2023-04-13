@@ -21,25 +21,36 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.protobuf.Duration;
+import com.google.type.DateTime;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import edu.northeastern.markergo.utils.UrlToBitmap;
 
 public class UserProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
     private FirebaseUser user;
     private TextView username;
-    private LinearLayout phoneLayout;
-    private TextView phone;
-    private ImageView userDP;
     private TextView email;
+    List<String> placesVisited;
+
+
+    private TextView dateOfJoining;
+    private TextView totalCheckIns;
+    private TextView checkInHistory;
     private static int PICK_IMAGE_REQUEST_CODE = 1;
     private StorageReference storageRef;
     private StorageReference imagesRef;
@@ -50,41 +61,52 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_profile);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         storageRef = FirebaseStorage.getInstance().getReference();
         imagesRef = storageRef.child("customUserPhotos/");
 
         username = findViewById(R.id.username);
-        userDP = findViewById(R.id.userDP);
         email = findViewById(R.id.email);
-        phone = findViewById(R.id.phone);
-        phoneLayout = findViewById(R.id.phoneLayout);
+        dateOfJoining = findViewById(R.id.dateOfJoining);
+        totalCheckIns = findViewById(R.id.totalCheckIns);
+        checkInHistory = findViewById(R.id.checkInHistory);
+        checkInHistory.setText("");
 
         setUserDetails();
     }
 
     private void setUserDetails() {
         user = mAuth.getCurrentUser();
+        String uid = user.getUid();
+        System.out.println("UID -> " + uid);
         assert user != null;
+        db.collection("users").document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                setPlacesVisited((List<String>) documentSnapshot.get("placesVisited"));
+                totalCheckIns.setText((String) documentSnapshot.get("count"));
+            }
+        });
 
         username.setText(user.getDisplayName());
         email.setText(user.getProviderData().get(1).getEmail());
-        if(user.getProviderData().get(1).getPhoneNumber() == null) {
-            phoneLayout.setVisibility(View.INVISIBLE);
-        } else {
-            phone.setText(user.getProviderData().get(1).getPhoneNumber());
-            phoneLayout.setVisibility(View.VISIBLE);
-        }
-
+        dateOfJoining.setText(new SimpleDateFormat("MM/dd/yyyy").format(new Date(user.getMetadata().getCreationTimestamp())));
         String photoUrl = String.valueOf(user.getPhotoUrl());
         setUserDP(photoUrl);
 
-        System.out.println("Provider = " + user.getProviderData());
-        System.out.println("Email = " + user.getEmail());
-        System.out.println("Name = " + user.getDisplayName());
-
-//        System.out.println("Phone = " + user.getProviderData().get(1).getPhoneNumber());
-//        System.out.println("Phone" + user.getProviderData().get(1).getPhoneNumber().getClass());
     }
+
+    public void setPlacesVisited(List<String> placesVisitedIDs) {
+        for(String placeID: placesVisitedIDs) {
+            db.collection("markers").document(placeID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    checkInHistory.append(" -  " + String.valueOf(documentSnapshot.get("name")) + "\n");
+                }
+            });
+        }
+    }
+
 
     private void setUserDP(String photoUrl) {
         if (!photoUrl.equals("null")) {
@@ -161,7 +183,7 @@ public class UserProfileActivity extends AppCompatActivity {
         try {
             thread.join();
             Bitmap image = whatever.getImageBitmap();
-            userDP.setImageBitmap(image);
+//            userDP.setImageBitmap(image);
             Log.i("done", "done");
         } catch (InterruptedException e) {
             Log.i("not done", "done");

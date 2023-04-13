@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F6F5F5"
     android:orientation="vertical"
     android:visibility="visible">
 
@@ -15,7 +14,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="252dp"
-            android:background="#153A57"
+            android:background="?attr/colorPrimaryVariant"
             android:orientation="vertical"
             android:visibility="visible">
 
@@ -31,7 +30,6 @@
                     android:id="@+id/userDP"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:onClick="updateUserDP"
                     android:src="@drawable/default_user" />
 
             </androidx.cardview.widget.CardView>
@@ -58,8 +56,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Username"
-                android:textColor="@color/black"
+                android:text="Name"
                 android:textSize="13sp" />
 
             <EditText
@@ -70,7 +67,6 @@
                 android:maxLines="1"
                 android:lines="1"
                 android:singleLine="true"
-                android:textColor="#000000"
                 android:textSize="18sp" />
 
             <View
@@ -90,7 +86,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
-                android:textColor="@color/black"
                 android:textSize="13sp" />
 
             <EditText
@@ -101,39 +96,6 @@
                 android:maxLines="1"
                 android:lines="1"
                 android:singleLine="true"
-                android:textColor="#000000"
-                android:textSize="18sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="15dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/phoneLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phone"
-                android:textColor="@color/black"
-                android:textSize="13sp" />
-
-            <EditText
-                android:id="@+id/phoneInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
-                android:maxLines="1"
-                android:lines="1"
-                android:singleLine="true"
-                android:textColor="#000000"
                 android:textSize="18sp" />
 
             <View
@@ -153,7 +115,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="15dp"
         android:text="Update Profile"
-        android:textSize="18dp" />
+        android:textSize="18dp"/>
 
 
 </LinearLayout>
