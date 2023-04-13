@@ -50,7 +50,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private StorageReference imagesRef;
 
     private EditText usernameInput;
-    private EditText emailInput;
     private ImageView userDP;
 
     private LinearLayout oldPasswordLayout;
@@ -72,7 +71,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
         usernameInput = findViewById(R.id.usernameInput);
         usernameInput.setText(user.getDisplayName());
-        emailInput.setText(user.getProviderData().get(1).getEmail());
         userDP = findViewById(R.id.userDP);
         String photoUrl = String.valueOf(user.getPhotoUrl());
         setUserDP(photoUrl);
