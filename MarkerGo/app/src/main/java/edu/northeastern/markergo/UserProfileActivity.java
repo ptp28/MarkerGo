@@ -82,7 +82,9 @@ public class UserProfileActivity extends AppCompatActivity {
         db.collection("users").document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                setPlacesVisited((List<String>) documentSnapshot.get("placesVisited"));
+                System.out.println(documentSnapshot.get("placesVisited"));
+//                setPlacesVisited((List<String>) documentSnapshot.get("placesVisited"));
+
                 totalCheckIns.setText((String) documentSnapshot.get("count"));
             }
         });
