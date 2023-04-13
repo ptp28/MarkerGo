@@ -19,7 +19,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
@@ -41,40 +40,52 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import edu.northeastern.markergo.models.PlaceDetails;
+import edu.northeastern.markergo.models.VisitationDetails;
 
 public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
-
+    // maker colour change
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private CollectionReference usersCollectionRef;
+    //
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
     public double latitude;
     public double longitude;
     LocationRequest locationRequest;
     Marker currentLocationMarker;
-
     private Location currentLocation;
     private Location markerLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int FINE_LOCATION_REQUEST_CODE = 10;
     private static final int ADD_MARKER_REQUEST_CODE = 100;
+    private static final int VISIT_MARKER_REQUEST_CODE = 200;
     private static final String TAG = "landingPage.java";
     private GoogleMap googleMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private FirebaseFirestore fireStoreDB;
     private List<PlaceDetails> markerDetailsList;
-    CollectionReference markersRef;
+    private Marker currMarker;
+    private CollectionReference markersRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +93,13 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_landing_page);
 
         fireStoreDB = FirebaseFirestore.getInstance();
+
+        // maker colour change
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        usersCollectionRef = fireStoreDB.collection("users");
+        //
+
         markersRef = fireStoreDB.collection("markers");
         markerDetailsList = new ArrayList<>();
         populateMarkers();
@@ -273,14 +291,63 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             PlaceDetails markerDetails = (PlaceDetails) data.getExtras().get("markerDetails");
             System.out.println("id = " + markerDetails.getId());
             setMarkerOnMap(markerDetails);
+        } else if (requestCode == VISIT_MARKER_REQUEST_CODE & resultCode == RESULT_OK && data != null) {
+            Bundle extras = data.getExtras();
+            if ((Boolean) extras.get("checkedIn")) {
+                LatLng position = this.currMarker.getPosition();
+                this.currMarker.remove();
+                this.currMarker = null;
+                PlaceDetails markerDetails = (PlaceDetails) extras.get("markerDetails");
+                addGreenMarker(markerDetails, position);
+            }
         }
     }
 
+    private void addGreenMarker(PlaceDetails markerDetails, LatLng position) {
+        final MarkerOptions[] markerOptions = new MarkerOptions[1];
+        markerOptions[0] = new MarkerOptions().position(position)
+                .title(markerDetails.getName())
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        Marker marker = googleMap.addMarker(markerOptions[0]);
+        marker.setTag(markerDetails);
+    }
+
+    private void addDefaultMarker(PlaceDetails markerDetails, LatLng position) {
+        final MarkerOptions[] markerOptions = new MarkerOptions[1];
+        markerOptions[0] = new MarkerOptions().position(position)
+                .title(markerDetails.getName());
+        Marker marker = googleMap.addMarker(markerOptions[0]);
+        marker.setTag(markerDetails);
+    }
+
     public void openLocationDetails(Marker marker) {
-        Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
-        locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
-        locationDetailsActivityIntent.putExtra("markerDetails", (Parcelable) marker.getTag());
-        startActivity(locationDetailsActivityIntent);
+        this.currMarker = marker;
+        PlaceDetails markerDetails = (PlaceDetails) marker.getTag();
+        System.out.println(markerDetails.getAddedBy());
+        assert markerDetails != null;
+        usersCollectionRef
+                .document(markerDetails.getAddedBy())
+                .collection("placesVisited")
+                .document(markerDetails.getId())
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    Intent locationDetailsActivityIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
+                    locationDetailsActivityIntent.putExtra("currentLocation", currentLocation);
+                    locationDetailsActivityIntent.putExtra("markerDetails", markerDetails);
+
+                    if (documentSnapshot.exists()) {
+                        Map<String, Object> data = documentSnapshot.getData();
+                        System.out.println(data);
+                        assert data != null;
+                        int count = Integer.parseInt(Objects.requireNonNull(data.get("count")).toString());
+                        long lastVisited = Long.parseLong(Objects.requireNonNull(data.get("lastVisited")).toString());
+                        VisitationDetails visitationDetails = new VisitationDetails(count, lastVisited);
+                        locationDetailsActivityIntent.putExtra("visitationDetails", visitationDetails);
+                        System.out.println("added");
+                    }
+                    startActivityForResult(locationDetailsActivityIntent, VISIT_MARKER_REQUEST_CODE);
+                })
+                .addOnFailureListener(e -> Toast.makeText(getApplicationContext(), "something went wrong", Toast.LENGTH_SHORT).show());
     }
 
     public void populateMarkers() {
@@ -299,7 +366,8 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                                         String.valueOf(documentSnapshot.get("name")),
                                         (Double) documentSnapshot.get("latitude"),
                                         (Double) documentSnapshot.get("longitude"),
-                                        (String) documentSnapshot.get("description")
+                                        (String) documentSnapshot.get("description"),
+                                        (String) documentSnapshot.get("addedBy")
                                 );
                                 setMarkerOnMap(markerDetails);
                             }
@@ -315,11 +383,24 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void setMarkerOnMap(PlaceDetails markerDetails) {
+        DocumentReference userRef;
         markerDetailsList.add(markerDetails);
         LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                .title(markerDetails.getName());
-        Marker marker = googleMap.addMarker(markerOptions);
-        marker.setTag(markerDetails);
+        if (user != null) {
+            userRef = usersCollectionRef.document(user.getUid());
+
+            userRef.collection("placesVisited")
+                    .document(markerDetails.getId())
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+                        if (snapshot.exists()) {
+                            addGreenMarker(markerDetails, latLng);
+                        } else {
+                            addDefaultMarker(markerDetails, latLng);
+                        }
+                    });
+        } else {
+            addDefaultMarker(markerDetails, latLng);
+        }
     }
 }

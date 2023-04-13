@@ -59,6 +59,7 @@ public class newLocation extends AppCompatActivity {
     public void addNewLocation(View view) {
         String location = locationText.getText().toString();
         String description = descriptionText.getText().toString();
+        String addedBy = user.getUid();
 
         if (location.isEmpty() && description.isEmpty()) {
             locationText.setError("Location cannot be empty");
@@ -81,7 +82,7 @@ public class newLocation extends AppCompatActivity {
             markersRef.add(newLocation).addOnSuccessListener(documentReference -> {
                 String id = documentReference.getId();
                 Intent data = new Intent();
-                PlaceDetails markerDetails = new PlaceDetails(id, location, point.latitude, point.longitude, description);
+                PlaceDetails markerDetails = new PlaceDetails(id, location, point.latitude, point.longitude, description, addedBy);
                 data.putExtra("markerDetails", (Parcelable) markerDetails);
                 setResult(RESULT_OK, data);
                 finish();
