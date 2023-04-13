@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -35,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import edu.northeastern.markergo.utils.UrlToBitmap;
 
@@ -44,7 +46,6 @@ public class UserProfileActivity extends AppCompatActivity {
     private FirebaseUser user;
     private TextView username;
     private TextView email;
-    List<String> placesVisited;
 
 
     private TextView dateOfJoining;
@@ -79,13 +80,19 @@ public class UserProfileActivity extends AppCompatActivity {
         String uid = user.getUid();
         System.out.println("UID -> " + uid);
         assert user != null;
-        db.collection("users").document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        db.collection("users").document(uid).collection("placesVisited").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                System.out.println(documentSnapshot.get("placesVisited"));
-//                setPlacesVisited((List<String>) documentSnapshot.get("placesVisited"));
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                final int[] totalCount = {0};
+                queryDocumentSnapshots.getDocuments().forEach(new Consumer<DocumentSnapshot>() {
+                    @Override
+                    public void accept(DocumentSnapshot documentSnapshot) {
+                        setPlacesVisitedText(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count")));
+                        totalCount[0] += Integer.parseInt(String.valueOf(String.valueOf(documentSnapshot.get("count"))));
+                    }
+                });
+                totalCheckIns.setText(String.valueOf(totalCount[0]));
 
-                totalCheckIns.setText((String) documentSnapshot.get("count"));
             }
         });
 
@@ -97,15 +104,13 @@ public class UserProfileActivity extends AppCompatActivity {
 
     }
 
-    public void setPlacesVisited(List<String> placesVisitedIDs) {
-        for(String placeID: placesVisitedIDs) {
-            db.collection("markers").document(placeID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    checkInHistory.append(" -  " + String.valueOf(documentSnapshot.get("name")) + "\n");
-                }
-            });
-        }
+    public void setPlacesVisitedText(String placeID, String count) {
+        db.collection("markers").document(placeID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                checkInHistory.append(" -  " + String.valueOf(documentSnapshot.get("name")) + ", visited - " + count + " time(s).\n");
+            }
+        });
     }
 
 
