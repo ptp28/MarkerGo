@@ -80,6 +80,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private FirebaseFirestore fireStoreDB;
     private List<PlaceDetails> markerDetailsList;
     CollectionReference markersRef;
+    SupportMapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +109,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         };
         askRequiredLocationPermissions();
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
