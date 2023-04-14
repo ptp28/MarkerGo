@@ -85,12 +85,7 @@ public class SignupActivity extends AppCompatActivity {
                 .build();
         assert user != null;
         user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                displayToast("Account created successfully!");
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            } else {
-                displayToast("Error in updating user profile");
-            }
+
         });
     }
 

@@ -10,4 +10,9 @@
     <style name="TextInputLayoutStyleHint" parent="TextAppearance.Design.Hint">
         <item name="android:textSize">16dp</item>
     </style>
+
+    <style name="roundedCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>
