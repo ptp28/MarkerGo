@@ -20,7 +20,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
@@ -40,7 +39,6 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -51,7 +49,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -214,7 +211,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         Bitmap userMarker = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 100, 156, false);
 
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                .title("{{User Name}}")
+                .title(user.getDisplayName())
                 .icon(BitmapDescriptorFactory.fromBitmap(userMarker));
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
@@ -223,9 +220,9 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onInfoWindowClick(@NonNull Marker marker) {
                 if (marker.equals(currentLocationMarker)) {
-                    Toast.makeText(landingPage.this, "Glad to see you here", Toast.LENGTH_SHORT).show();
+                    openProfileDetailsActivity(marker);
                 } else {
-                    openLocationDetails(marker);
+                    openLocationDetailsActivity(marker);
                 }
             }
         });
@@ -320,7 +317,12 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         marker.setTag(markerDetails);
     }
 
-    public void openLocationDetails(Marker marker) {
+    public void openProfileDetailsActivity(Marker marker) {
+        Intent profileDetailsIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
+        startActivity(profileDetailsIntent);
+    }
+
+    public void openLocationDetailsActivity(Marker marker) {
         this.currMarker = marker;
         PlaceDetails markerDetails = (PlaceDetails) marker.getTag();
         System.out.println(markerDetails.getAddedBy());
