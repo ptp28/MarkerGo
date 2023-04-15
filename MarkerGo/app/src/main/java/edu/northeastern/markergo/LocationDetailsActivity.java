@@ -1,5 +1,6 @@
 package edu.northeastern.markergo;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -13,17 +14,20 @@ import android.os.Parcelable;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -91,6 +95,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private boolean checkedIn = false;
     private static final int PICK_IMAGE_REQUEST_CODE = 1;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, MMM dd yyyy HH:mm");
+    public DrawerLayout drawerLayout;
+    public ActionBarDrawerToggle actionBarDrawerToggle;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +120,13 @@ public class LocationDetailsActivity extends AppCompatActivity {
         addPhotoTextView = findViewById(R.id.textViewAddPhoto);
         checkInButton = findViewById(R.id.buttonCheckIn);
         lastVisitTextView = findViewById(R.id.textViewLastVisitLabel);
+        drawerLayout = findViewById(R.id.my_drawer_layout);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+        actionBarDrawerToggle.syncState();
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        setupDrawerContent(navigationView);
 
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -164,6 +178,43 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
         populateImageList();
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+    }
+
+    public void selectDrawerItem(MenuItem menuItem) {
+        switch(menuItem.getItemId()) {
+            case R.id.profile_item:
+                startActivity(new Intent(LocationDetailsActivity.this, UserProfileActivity.class));
+                break;
+            case R.id.logout_item:
+                //logout
+                break;
+            case R.id.addLocation_item:
+                startActivity(new Intent(LocationDetailsActivity.this, newLocation.class));
+                break;
+            default:
+                break;
+        }
+        menuItem.setChecked(true);
+    }
+
 
     @Override
     public void onBackPressed() {

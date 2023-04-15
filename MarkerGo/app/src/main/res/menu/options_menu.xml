@@ -4,12 +4,12 @@
     tools:ignore="HardcodedText">
     <item android:id="@+id/profile_item"
         android:title="Profile" />
-    <item android:id="@+id/favourites_item"
-        android:title="Favourites" />
-    <item android:id="@+id/contribution_item"
-        android:title="Contribution" />
-    <item android:id="@+id/addMarker_item"
-        android:title="Add Marker" />
+<!--    <item android:id="@+id/favourites_item"-->
+<!--        android:title="Favourites" />-->
+<!--    <item android:id="@+id/contribution_item"-->
+<!--        android:title="Contribution" />-->
+    <item android:id="@+id/addLocation_item"
+        android:title="Add new location marker" />
     <item android:id="@+id/logout_item"
         android:title="Logout" />
 </menu>

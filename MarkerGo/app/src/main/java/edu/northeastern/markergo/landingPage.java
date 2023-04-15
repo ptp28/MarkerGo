@@ -67,6 +67,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     //
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
+    private NavigationView navigationView;
     public double latitude;
     public double longitude;
     LocationRequest locationRequest;
@@ -85,7 +86,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private List<PlaceDetails> markerDetailsList;
     private Marker currMarker;
     private CollectionReference markersRef;
-    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,13 +93,9 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_landing_page);
 
         fireStoreDB = FirebaseFirestore.getInstance();
-
-        // maker colour change
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         usersCollectionRef = fireStoreDB.collection("users");
-        //
-
         markersRef = fireStoreDB.collection("markers");
         markerDetailsList = new ArrayList<>();
         populateMarkers();
@@ -119,11 +115,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         drawerLayout = findViewById(R.id.my_drawer_layout);
-
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
-
-        // pass the Open and Close toggle for the drawer layout listener
-        // to toggle the button
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
@@ -159,12 +151,12 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             case R.id.profile_item:
                 startActivity(new Intent(landingPage.this, UserProfileActivity.class));
                 break;
-//            case R.id.logout_item:
-//
-//                break;
-//            case R.id.nav_third_fragment:
-//                fragmentClass = ThirdFragment.class;
-//                break;
+            case R.id.logout_item:
+                //logout
+                break;
+            case R.id.addLocation_item:
+                startActivity(new Intent(landingPage.this, newLocation.class));
+                break;
             default:
                 break;
         }
