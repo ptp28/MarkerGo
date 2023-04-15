@@ -71,7 +71,7 @@ public class UserProfileActivity extends AppCompatActivity {
         totalCheckIns = findViewById(R.id.totalCheckIns);
         checkInHistory = findViewById(R.id.checkInHistory);
         checkInHistory.setText("");
-
+        totalCheckIns.setText("0");
         setUserDetails();
     }
 
@@ -92,7 +92,9 @@ public class UserProfileActivity extends AppCompatActivity {
                     }
                 });
                 totalCheckIns.setText(String.valueOf(totalCount[0]));
-
+                if(totalCount[0] == 0) {
+                    checkInHistory.setText(" -  You haven't checked in to any places yet. START MOVING !");
+                }
             }
         });
 
