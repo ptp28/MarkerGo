@@ -27,6 +27,7 @@
                 app:cardCornerRadius="100dp">
 
                 <ImageView
+                    android:onClick="updateUserDP"
                     android:id="@+id/userDP"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
