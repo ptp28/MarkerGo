@@ -6,6 +6,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
@@ -40,6 +41,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -57,7 +59,7 @@ import java.util.function.Consumer;
 import edu.northeastern.markergo.models.PlaceDetails;
 import edu.northeastern.markergo.models.VisitationDetails;
 
-public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
+public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener{
     // maker colour change
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -83,6 +85,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private List<PlaceDetails> markerDetailsList;
     private Marker currMarker;
     private CollectionReference markersRef;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,11 +125,50 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         // pass the Open and Close toggle for the drawer layout listener
         // to toggle the button
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        setupDrawerContent(navigationView);
 
         // to make the Navigation drawer icon always appear on the action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+    }
+
+    public void selectDrawerItem(MenuItem menuItem) {
+        switch(menuItem.getItemId()) {
+            case R.id.profile_item:
+                startActivity(new Intent(landingPage.this, UserProfileActivity.class));
+                break;
+//            case R.id.logout_item:
+//
+//                break;
+//            case R.id.nav_third_fragment:
+//                fragmentClass = ThirdFragment.class;
+//                break;
+            default:
+                break;
+        }
+        menuItem.setChecked(true);
     }
 
     private void askRequiredLocationPermissions() {
@@ -148,7 +190,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 .setPositiveButton("Ok", (dialog, which) ->
                         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_REQUEST_CODE))
                 .show();
-
     }
 
     private void askToTurnOnGPSInSettings() {
@@ -166,15 +207,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         });
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
