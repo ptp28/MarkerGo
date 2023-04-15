@@ -206,8 +206,11 @@ public class LocationDetailsActivity extends AppCompatActivity {
             case R.id.logout_item:
                 //logout
                 break;
-            case R.id.addLocation_item:
-                startActivity(new Intent(LocationDetailsActivity.this, newLocation.class));
+            case R.id.favourites_item:
+                //favourites
+                break;
+            case R.id.home_item:
+                startActivity(new Intent(LocationDetailsActivity.this, landingPage.class));
                 break;
             default:
                 break;

@@ -154,8 +154,8 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             case R.id.logout_item:
                 //logout
                 break;
-            case R.id.addLocation_item:
-                startActivity(new Intent(landingPage.this, newLocation.class));
+            case R.id.favourites_item:
+                //favourites
                 break;
             default:
                 break;
