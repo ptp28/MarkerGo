@@ -46,6 +46,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private FirebaseUser user;
     private TextView username;
     private TextView email;
+    private ImageView userDP;
 
 
     private TextView dateOfJoining;
@@ -67,6 +68,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         username = findViewById(R.id.username);
         email = findViewById(R.id.email);
+        userDP = findViewById(R.id.userDP);
         dateOfJoining = findViewById(R.id.dateOfJoining);
         totalCheckIns = findViewById(R.id.totalCheckIns);
         checkInHistory = findViewById(R.id.checkInHistory);
@@ -102,6 +104,7 @@ public class UserProfileActivity extends AppCompatActivity {
         email.setText(user.getProviderData().get(1).getEmail());
         dateOfJoining.setText(new SimpleDateFormat("MM/dd/yyyy").format(new Date(user.getMetadata().getCreationTimestamp())));
         String photoUrl = String.valueOf(user.getPhotoUrl());
+        System.out.println("PHOTOURL = " + photoUrl);
         setUserDP(photoUrl);
 
     }
@@ -191,7 +194,7 @@ public class UserProfileActivity extends AppCompatActivity {
         try {
             thread.join();
             Bitmap image = whatever.getImageBitmap();
-//            userDP.setImageBitmap(image);
+            userDP.setImageBitmap(image);
             Log.i("done", "done");
         } catch (InterruptedException e) {
             Log.i("not done", "done");
