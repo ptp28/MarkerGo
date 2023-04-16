@@ -20,24 +20,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.facebook.AccessToken;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Source;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import edu.northeastern.markergo.utils.UrlToBitmap;
 
@@ -51,11 +47,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
     private EditText usernameInput;
     private ImageView userDP;
-
-    private LinearLayout oldPasswordLayout;
-    private LinearLayout newPasswordLayout;
-    private EditText oldPasswordInput;
-    private EditText newPasswordInput;
+    private Button changePasswordBtn;
 
     private static int PICK_IMAGE_REQUEST_CODE = 1;
 
@@ -77,23 +69,37 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
         usernameInput = findViewById(R.id.usernameInput);
         usernameInput.setText(user.getDisplayName());
+        changePasswordBtn = findViewById(R.id.changePasswordBtn);
 
-        oldPasswordLayout = findViewById(R.id.oldPasswordLayout);
-        newPasswordLayout = findViewById(R.id.newPasswordLayout);
-        oldPasswordInput = findViewById(R.id.oldPasswordInput);
-        newPasswordInput = findViewById(R.id.newPasswordInput);
 
         String providerType = user.getProviderData().get(1).getProviderId();
         if(providerType.equals("google.com") || providerType.equals("facebook.com")) {
-            oldPasswordLayout.setVisibility(View.INVISIBLE);
-            newPasswordLayout.setVisibility(View.INVISIBLE);
+            changePasswordBtn.setVisibility(View.INVISIBLE);
         }
-
     }
 
-    public void changePassword(View view) {
+
+    public void showChangePasswordDialog(View view) {
+        BottomSheetDialog sheetDialog = new BottomSheetDialog(this);
+        sheetDialog.setContentView(R.layout.change_password_bottom_sheet);
+        sheetDialog.show();
+
+
+        TextInputEditText oldPasswordInput = sheetDialog.findViewById(R.id.oldPasswordIP);
+        TextInputEditText newPasswordInput = sheetDialog.findViewById(R.id.newPasswordIP);
+
+        Button updatePasswordBtn = sheetDialog.findViewById(R.id.updatePasswordBtn);
+        updatePasswordBtn.setOnClickListener((View v) -> {
+            String oldPassword = oldPasswordInput.getText().toString();
+            String newPassword = newPasswordInput.getText().toString();
+            changePassword(oldPassword, newPassword);
+            sheetDialog.dismiss();
+        });
+    }
+
+    public void changePassword(String oldPassword, String newPassword) {
         AuthCredential credential = EmailAuthProvider
-                .getCredential(user.getEmail(), oldPasswordInput.getText().toString());
+                .getCredential(user.getEmail(), oldPassword);
 
         // Prompt the user to re-provide their sign-in credentials
         user.reauthenticate(credential)
@@ -101,7 +107,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            user.updatePassword(newPasswordInput.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            user.updatePassword(newPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
