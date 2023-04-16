@@ -152,7 +152,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 startActivity(new Intent(landingPage.this, UserProfileActivity.class));
                 break;
             case R.id.logout_item:
-                //logout
+                mAuth.signOut();
                 break;
             case R.id.favourites_item:
                 //favourites

@@ -6,14 +6,16 @@
     android:id="@+id/my_drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".LocationDetailsActivity"
     tools:ignore="HardcodedText">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
 
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        tools:context=".LocationDetailsActivity">
+
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appbar"
@@ -237,7 +239,9 @@
         </androidx.core.widget.NestedScrollView>
 
 
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"

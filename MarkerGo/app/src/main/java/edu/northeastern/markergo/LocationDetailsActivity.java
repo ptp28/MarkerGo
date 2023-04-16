@@ -120,6 +120,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         addPhotoTextView = findViewById(R.id.textViewAddPhoto);
         checkInButton = findViewById(R.id.buttonCheckIn);
         lastVisitTextView = findViewById(R.id.textViewLastVisitLabel);
+
         drawerLayout = findViewById(R.id.my_drawer_layout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -204,7 +205,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 startActivity(new Intent(LocationDetailsActivity.this, UserProfileActivity.class));
                 break;
             case R.id.logout_item:
-                //logout
+                mAuth.signOut();
                 break;
             case R.id.favourites_item:
                 //favourites
