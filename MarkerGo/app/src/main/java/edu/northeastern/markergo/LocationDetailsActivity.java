@@ -328,8 +328,13 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 .addOnSuccessListener(unused -> {
                     this.checkedIn = true;
                     setLastVisitedText(lastVisited);
-                    long diff = TimeUnit.DAYS.convert(lastVisited - prevLastVisited, TimeUnit.MILLISECONDS);
-                    if (diff > 0) {
+
+                    LocalDateTime oldDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(prevLastVisited), TimeZone.getDefault().toZoneId());
+                    LocalDateTime newDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastVisited), TimeZone.getDefault().toZoneId());
+
+                    if (newDate.getYear() != oldDate.getYear() ||
+                            newDate.getMonth() != oldDate.getMonth() ||
+                            newDate.getDayOfMonth() != oldDate.getDayOfMonth()) {
                         konfettiView.start(party);
                         userRef.update("points", FieldValue.increment(100));
                         // display box of points gained and total points
