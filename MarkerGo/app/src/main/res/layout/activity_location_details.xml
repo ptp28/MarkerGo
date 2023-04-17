@@ -9,238 +9,248 @@
     tools:context=".LocationDetailsActivity"
     tools:ignore="HardcodedText">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        tools:context=".LocationDetailsActivity">
+        android:layout_height="match_parent">
 
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true">
-
-            <com.google.android.material.appbar.CollapsingToolbarLayout
-                android:id="@+id/CollapsingToolbarLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:collapsedTitleTextColor="?attr/colorOnPrimary"
-                app:contentScrim="?attr/colorPrimary"
-                app:expandedTitleTextColor="@color/white"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                app:layout_scrollInterpolator="@android:anim/decelerate_interpolator"
-                app:title="Sample Place Name"
-                app:titleEnabled="true"
-                app:toolbarId="@+id/toolbar">
-
-                <ImageView
-                    android:id="@+id/app_bar_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/lake"
-                    app:srcCompat="@drawable/lake"
-                    tools:srcCompat="@drawable/lake" />
-
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"></androidx.appcompat.widget.Toolbar>
-            </com.google.android.material.appbar.CollapsingToolbarLayout>
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+            android:fitsSystemWindows="true"
+            tools:context=".LocationDetailsActivity">
 
-            <LinearLayout
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:fitsSystemWindows="true">
+
+                <com.google.android.material.appbar.CollapsingToolbarLayout
+                    android:id="@+id/CollapsingToolbarLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:collapsedTitleTextColor="?attr/colorOnPrimary"
+                    app:contentScrim="?attr/colorPrimary"
+                    app:expandedTitleTextColor="@color/white"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    app:layout_scrollInterpolator="@android:anim/decelerate_interpolator"
+                    app:title="Sample Place Name"
+                    app:titleEnabled="true"
+                    app:toolbarId="@+id/toolbar">
+
+                    <ImageView
+                        android:id="@+id/app_bar_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/lake"
+                        app:srcCompat="@drawable/lake"
+                        tools:srcCompat="@drawable/lake" />
+
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"></androidx.appcompat.widget.Toolbar>
+                </com.google.android.material.appbar.CollapsingToolbarLayout>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="10dp"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/buttonGetDirections"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:onClick="getDirectionsToLocation"
-                        android:padding="5dp"
-                        android:text="Directions" />
-
-                    <Button
-                        android:id="@+id/buttonCheckIn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_weight="1"
-                        android:onClick="checkInToLocation"
-                        android:padding="5dp"
-                        android:text="Check In" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="10dp"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textViewLastVisitLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="You last visited this place on the morning of 26/10/2022."
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="10dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textViewDescriptionLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Description:"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/textViewDescription"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/textViewEditLink"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Edit/Make a contribution"
-                        android:textColor="#03A9F4" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="10dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textViewTimeToVisitLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Best Time To Visit:"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <include layout="@layout/time_visit_buttons" />
-
-                    </HorizontalScrollView>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="10dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textViewStatisticsLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Stats:"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/textViewStatistics"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="10+ people visited this marker this week."
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="10dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textViewPhotosLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Photos:"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/buttonGetDirections"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:onClick="getDirectionsToLocation"
+                            android:padding="5dp"
+                            android:text="Directions" />
+
+                        <Button
+                            android:id="@+id/buttonCheckIn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:onClick="checkInToLocation"
+                            android:padding="5dp"
+                            android:text="Check In" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_margin="10dp"
                         android:orientation="vertical">
 
-                        <LinearLayout
+                        <TextView
+                            android:id="@+id/textViewLastVisitLabel"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:text="You last visited this place on the morning of 26/10/2022."
+                            android:textSize="16sp" />
+                    </LinearLayout>
 
-                            <TextView
-                                android:id="@+id/textViewAddPhoto"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="5dp"
-                                android:layout_weight="1"
-                                android:text="Add a photo"
-                                android:textAlignment="textStart"
-                                android:textColor="#03A9F4"
-                                android:textSize="18sp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp"
+                        android:orientation="vertical">
 
+                        <TextView
+                            android:id="@+id/textViewDescriptionLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Description:"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
 
-                            <TextView
-                                android:id="@+id/textViewAllPhotosLink"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="5dp"
-                                android:layout_weight="1"
-                                android:text="View all photos"
-                                android:textAlignment="textEnd"
-                                android:textColor="#03A9F4"
-                                android:textSize="18sp" />
+                        <TextView
+                            android:id="@+id/textViewDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+                            android:textSize="16sp" />
 
-                        </LinearLayout>
-
-
-                        <include layout="@layout/activity_all_location_photos" />
+                        <TextView
+                            android:id="@+id/textViewEditLink"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Edit/Make a contribution"
+                            android:textColor="#03A9F4" />
 
                     </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textViewTimeToVisitLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Best Time To Visit:"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <include layout="@layout/time_visit_buttons" />
+
+                        </HorizontalScrollView>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textViewStatisticsLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Stats:"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textViewStatistics"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="10+ people visited this marker this week."
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textViewPhotosLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Photos:"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:layout_margin="10dp"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/textViewAddPhoto"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dp"
+                                    android:layout_weight="1"
+                                    android:text="Add a photo"
+                                    android:textAlignment="textStart"
+                                    android:textColor="#03A9F4"
+                                    android:textSize="18sp" />
+
+
+                                <TextView
+                                    android:id="@+id/textViewAllPhotosLink"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dp"
+                                    android:layout_weight="1"
+                                    android:text="View all photos"
+                                    android:textAlignment="textEnd"
+                                    android:textColor="#03A9F4"
+                                    android:textSize="18sp" />
+
+                            </LinearLayout>
+
+
+                            <include layout="@layout/activity_all_location_photos" />
+
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+            </androidx.core.widget.NestedScrollView>
 
 
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <nl.dionsegijn.konfetti.xml.KonfettiView
+            android:id="@+id/konfettiView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
 
     <com.google.android.material.navigation.NavigationView

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,10 +63,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import edu.northeastern.markergo.models.PlaceDetails;
 import edu.northeastern.markergo.models.VisitationDetails;
 import edu.northeastern.markergo.utils.UrlToBitmap;
+import nl.dionsegijn.konfetti.core.Party;
+import nl.dionsegijn.konfetti.core.PartyFactory;
+import nl.dionsegijn.konfetti.core.emitter.Emitter;
+import nl.dionsegijn.konfetti.core.emitter.EmitterConfig;
+import nl.dionsegijn.konfetti.core.models.Shape;
+import nl.dionsegijn.konfetti.core.models.Size;
+import nl.dionsegijn.konfetti.xml.KonfettiView;
 
 public class LocationDetailsActivity extends AppCompatActivity {
 
@@ -98,6 +108,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView navigationView;
+    private KonfettiView konfettiView;
+    private Party party;
+    private long lastVisited;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +124,21 @@ public class LocationDetailsActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         markersCollectionRef = db.collection("markers");
         usersCollectionRef = db.collection("users");
+
+        Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_heart);
+        Shape.DrawableShape drawableShape = new Shape.DrawableShape(drawable, true);
+
+        konfettiView = findViewById(R.id.konfettiView);
+        EmitterConfig emitterConfig = new Emitter(2L, TimeUnit.SECONDS).perSecond(200);
+        party = new PartyFactory(emitterConfig)
+                .angle(270)
+                .spread(90)
+                .setSpeed(50f)
+                .timeToLive(3000L)
+                .shapes(new Shape.Rectangle(0.2f), drawableShape)
+                .sizes(new Size(12, 5f, 0.2f))
+                .position(0.0, 0.0, 1.0, 0.0)
+                .build();
 
         descriptionTextView = findViewById(R.id.textViewDescription);
         collapsingToolbarLayout = findViewById(R.id.CollapsingToolbarLayout);
@@ -151,8 +179,10 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
             if (bundle.containsKey("visitationDetails")) {
                 visitationDetails = (VisitationDetails) bundle.get("visitationDetails");
-                setLastVisitedText(visitationDetails.getLastVisited());
+                this.lastVisited = visitationDetails.getLastVisited();
+                setLastVisitedText(this.lastVisited);
             } else {
+                this.lastVisited = 0;
                 String text = "You have never visited this place.";
                 lastVisitTextView.setText(text);
             }
@@ -200,7 +230,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
-        switch(menuItem.getItemId()) {
+        switch (menuItem.getItemId()) {
             case R.id.profile_item:
                 startActivity(new Intent(LocationDetailsActivity.this, UserProfileActivity.class));
                 break;
@@ -290,15 +320,22 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
         Map<String, Object> data = new HashMap<>();
         data.put("count", FieldValue.increment(1));
-        long lastVisited = new Date().getTime();
+        long prevLastVisited = this.lastVisited;
+        this.lastVisited = new Date().getTime();
         data.put("lastVisited", lastVisited);
 
         placeRef.set(data, SetOptions.merge())
                 .addOnSuccessListener(unused -> {
                     this.checkedIn = true;
                     setLastVisitedText(lastVisited);
-                    Toast.makeText(getApplicationContext(), "Checked-in!", Toast.LENGTH_SHORT).show();
-                    userRef.update("points", FieldValue.increment(100));
+                    long diff = TimeUnit.DAYS.convert(lastVisited - prevLastVisited, TimeUnit.MILLISECONDS);
+                    if (diff > 0) {
+                        konfettiView.start(party);
+                        userRef.update("points", FieldValue.increment(100));
+                        // display box of points gained and total points
+                    } else {
+                        Toast.makeText(getApplicationContext(), "no points earned", Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .addOnFailureListener(e -> Log.i("status", "failed to check-in on firebase"));
     }
