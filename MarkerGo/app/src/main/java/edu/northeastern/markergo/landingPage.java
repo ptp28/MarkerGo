@@ -40,6 +40,7 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,11 +60,11 @@ import java.util.function.Consumer;
 import edu.northeastern.markergo.models.PlaceDetails;
 import edu.northeastern.markergo.models.VisitationDetails;
 
-public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener{
+public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
     // maker colour change
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-    private CollectionReference usersCollectionRef;
+    private DocumentReference userRef;
     //
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
@@ -95,7 +96,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         fireStoreDB = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
-        usersCollectionRef = fireStoreDB.collection("users");
+        userRef = fireStoreDB.collection("users").document(user.getUid());
         markersRef = fireStoreDB.collection("markers");
         markerDetailsList = new ArrayList<>();
         populateMarkers();
@@ -147,7 +148,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
-        switch(menuItem.getItemId()) {
+        switch (menuItem.getItemId()) {
             case R.id.profile_item:
                 startActivity(new Intent(landingPage.this, UserProfileActivity.class));
                 break;
@@ -272,6 +273,17 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onMapLongClick(LatLng point) {
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            Map<String, Object> data = documentSnapshot.getData();
+            if (data != null && data.containsKey("points") && (long) data.get("points") >= 500) {
+                displayAlertDialog(point);
+            } else {
+                Toast.makeText(getApplicationContext(), "You need at-least 500 points to add a new location", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void displayAlertDialog(LatLng point) {
         markersRef
                 .whereEqualTo("latitude", point.latitude)
                 .whereEqualTo("longitude", point.longitude)
@@ -351,8 +363,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         PlaceDetails markerDetails = (PlaceDetails) marker.getTag();
         System.out.println(markerDetails.getAddedBy());
         assert markerDetails != null;
-        usersCollectionRef
-                .document(markerDetails.getAddedBy())
+        userRef
                 .collection("placesVisited")
                 .document(markerDetails.getId())
                 .get()
@@ -409,12 +420,9 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void setMarkerOnMap(PlaceDetails markerDetails) {
-        DocumentReference userRef;
         markerDetailsList.add(markerDetails);
         LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
         if (user != null) {
-            userRef = usersCollectionRef.document(user.getUid());
-
             userRef.collection("placesVisited")
                     .document(markerDetails.getId())
                     .get()

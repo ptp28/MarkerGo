@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -38,6 +39,7 @@ public class newLocation extends AppCompatActivity {
     private FirebaseUser user;
     private FirebaseFirestore db;
     private CollectionReference markersRef;
+    private DocumentReference userRef;
     private LatLng point;
 
     @Override
@@ -49,6 +51,7 @@ public class newLocation extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
+        userRef = db.collection("users").document(user.getUid());
         markersRef = db.collection("markers");
         point = (LatLng) getIntent().getExtras().get("location");
 
@@ -86,6 +89,10 @@ public class newLocation extends AppCompatActivity {
                 data.putExtra("markerDetails", (Parcelable) markerDetails);
                 setResult(RESULT_OK, data);
                 finish();
+                userRef.update("points", FieldValue.increment(-500))
+                        .addOnSuccessListener(unused -> {
+                            Toast.makeText(getApplicationContext(), "Deducted 500 points", Toast.LENGTH_SHORT).show();
+                        });
             });
         }
     }
