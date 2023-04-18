@@ -154,6 +154,8 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 break;
             case R.id.logout_item:
                 mAuth.signOut();
+                Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(landingPage.this, MainActivity.class));
                 break;
             case R.id.favourites_item:
                 //favourites
