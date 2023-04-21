@@ -1,7 +1,5 @@
 package edu.northeastern.markergo;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -10,6 +8,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -71,6 +71,8 @@ public class SignupActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     addNameToUserprofile(name);
                     displayToast("Signup successful");
+                    Intent intent = new Intent(getApplicationContext(), landingPage.class);
+                    startActivity(intent);
                 } else {
                     displayToast("Account with this email exists already!");
                 }
