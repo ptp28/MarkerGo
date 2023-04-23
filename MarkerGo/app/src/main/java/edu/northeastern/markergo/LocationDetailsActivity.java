@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -13,10 +14,13 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,6 +76,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
     RecyclerView.LayoutManager imageGridLayoutManager;
     ImageRecyclerViewAdapter recyclerViewAdapter;
     List<Bitmap> imageList;
+
+    List<Uri> imageSources;
     private TextView descriptionTextView;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private ImageView appbarCoverImage;
@@ -141,13 +147,13 @@ public class LocationDetailsActivity extends AppCompatActivity {
         checkInButton = findViewById(R.id.buttonCheckIn);
         lastVisitTextView = findViewById(R.id.textViewLastVisitLabel);
 
-        drawerLayout = findViewById(R.id.my_drawer_layout);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
-        actionBarDrawerToggle.syncState();
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        setupDrawerContent(navigationView);
+//        drawerLayout = findViewById(R.id.my_drawer_layout);
+//        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
+//        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+//        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+//        actionBarDrawerToggle.syncState();
+//        navigationView = (NavigationView) findViewById(R.id.nav_view);
+//        setupDrawerContent(navigationView);
 
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -195,6 +201,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         }
 
         imageList = new ArrayList<>();
+        imageSources = new ArrayList<>();
         recyclerViewAdapter = new ImageRecyclerViewAdapter(imageList);
         recyclerViewImages.setAdapter(recyclerViewAdapter);
 
@@ -203,44 +210,29 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu2, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        selectDrawerItem(menuItem);
-                        return true;
-                    }
-                });
-    }
-
-    public void selectDrawerItem(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.profile_item:
                 startActivity(new Intent(LocationDetailsActivity.this, UserProfileActivity.class));
-                break;
+                return true;
             case R.id.logout_item:
                 mAuth.signOut();
                 Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(LocationDetailsActivity.this, MainActivity.class));
-                break;
-            case R.id.favourites_item:
-                //favourites
-                break;
+                return true;
             case R.id.home_item:
                 startActivity(new Intent(LocationDetailsActivity.this, landingPage.class));
-                break;
+                return true;
             default:
-                break;
+                return super.onOptionsItemSelected(item);
         }
-        menuItem.setChecked(true);
     }
 
 
@@ -254,12 +246,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     private void populateImageList() {
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
         imagesRef.listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference ref : listResult.getItems()) {
@@ -291,8 +277,26 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "sign in to update stuff on firebase", Toast.LENGTH_SHORT).show();
             }
         } else {
-            Toast.makeText(getApplicationContext(), "failed. not within 100m", Toast.LENGTH_SHORT).show();
+            showFailedCheckInDialog();
         }
+    }
+
+    private void showFailedCheckInDialog() {
+        View content = inflater.inflate(R.layout.alert_dialog, null);
+        ImageView imageIcon = content.findViewById(R.id.img_icon);
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.alert_triangle);
+        imageIcon.setImageBitmap(icon);
+        TextView titleTV = content.findViewById(R.id.txttite);
+        titleTV.setText("Failed Check-in!");
+        TextView textTV = (TextView) content.findViewById(R.id.txtDesc);
+        textTV.setText("Oops! Looks like you are more than 100m away from this location.\nPlease try again when yo are within 100m.");
+        LinearLayout buttonsLayout = content.findViewById(R.id.buttonsLayout);
+        buttonsLayout.setVisibility(View.GONE);
+
+        dialog = new Dialog(this);
+        dialog.setContentView(content);
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_window);
+        dialog.show();
     }
 
     private void updateVisitationStatsForMarker() {
@@ -341,16 +345,16 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     private void showPointsEarnedDialog() {
-        showDialog("You received 100 points for checking in to this place!");
+        showPointsDialog("You received 100 points for checking in to this place!");
     }
 
     private void showNoPointsEarnedDialog() {
-        showDialog("You did not receive points since your latest check-in for this place is today.");
+        showPointsDialog("You did not receive points since your latest check-in for this place is today.");
     }
 
-    void showDialog(String text) {
+    void showPointsDialog(String text) {
         View content = inflater.inflate(R.layout.points_dialog, null);
-        TextView tv = (TextView) content.findViewById(R.id.txtDesc);
+        TextView tv = content.findViewById(R.id.txtDesc);
         tv.setText(text);
 
         dialog = new Dialog(this);
@@ -377,7 +381,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             Intent photoRecyclerIntent = new Intent(getApplicationContext(), AllLocationPhotosActivity.class);
-            photoRecyclerIntent.putExtra("AllImages", (Serializable) imageList);
+            photoRecyclerIntent.putExtra("AllImagesSources", (Serializable) imageSources);
             startActivity(photoRecyclerIntent);
         }
     };
@@ -455,6 +459,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         try {
             thread.join();
             Bitmap image = whatever.getImageBitmap();
+            imageSources.add(uri);
             imageList.add(image);
             recyclerViewAdapter.notifyItemInserted(imageList.size());
         } catch (InterruptedException e) {

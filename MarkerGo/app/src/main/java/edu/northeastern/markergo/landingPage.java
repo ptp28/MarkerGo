@@ -18,10 +18,11 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,6 +78,7 @@ import nl.dionsegijn.konfetti.xml.KonfettiView;
 public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
     // maker colour change
     private LayoutInflater inflater;
+
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private DocumentReference userRef;
@@ -133,6 +135,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         fireStoreDB = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+
         userRef = fireStoreDB.collection("users").document(user.getUid());
         markersRef = fireStoreDB.collection("markers");
         markerDetailsList = new ArrayList<>();
@@ -144,17 +147,13 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        drawerLayout = findViewById(R.id.my_drawer_layout);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
-        actionBarDrawerToggle.syncState();
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        setupDrawerContent(navigationView);
+    }
 
-        // to make the Navigation drawer icon always appear on the action bar
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+        return true;
     }
 
     private void setUpLocationManagerWithPermissions() {
@@ -172,7 +171,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onBackPressed() {
         AlertDialog.Builder build = new AlertDialog.Builder(this);
-//        build.setTitle("EXIT");
         build.setMessage("Are you sure you want to exit?")
                 .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
@@ -194,52 +192,29 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         int height;
         int width;
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            width = (int) (getResources().getDisplayMetrics().widthPixels*0.72);
-            height = (int) (getResources().getDisplayMetrics().heightPixels*0.25);
-        }
-        else{
-            width = (int) (getResources().getDisplayMetrics().widthPixels*0.6);
-            height = (int) (getResources().getDisplayMetrics().heightPixels*0.35);
+            width = (int) (getResources().getDisplayMetrics().widthPixels * 0.72);
+            height = (int) (getResources().getDisplayMetrics().heightPixels * 0.25);
+        } else {
+            width = (int) (getResources().getDisplayMetrics().widthPixels * 0.6);
+            height = (int) (getResources().getDisplayMetrics().heightPixels * 0.35);
         }
         alertDialog.getWindow().setLayout(width, height);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        selectDrawerItem(menuItem);
-                        return true;
-                    }
-                });
-    }
-
-    public void selectDrawerItem(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.profile_item:
                 startActivity(new Intent(landingPage.this, UserProfileActivity.class));
-                break;
+                return true;
             case R.id.logout_item:
                 mAuth.signOut();
                 Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(landingPage.this, MainActivity.class));
-                break;
-            case R.id.favourites_item:
-                //favourites
-                break;
+                return true;
             default:
-                break;
+                return super.onOptionsItemSelected(item);
         }
-        menuItem.setChecked(true);
     }
 
     private void askRequiredLocationPermissions() {
@@ -268,7 +243,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         }).setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
             }
         });
         final AlertDialog alertDialog = builder.create();
@@ -338,16 +312,10 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         switch (requestCode) {
             case FINE_LOCATION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
                     setUpLocationManagerWithPermissions();
-                }
-                else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("The app cannot function without location access. \n" +
-                                    "Please allow the permission to use location services on the next window.")
-                            .setPositiveButton("Ok", (dialog, which) ->
-                                    askToTurnOnGPSInSettings())
-                            .show();
+                } else {
+                    setUpLocationManagerWithPermissions();
                 }
                 break;
         }
@@ -523,6 +491,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                                         (String) documentSnapshot.get("description"),
                                         (String) documentSnapshot.get("addedBy")
                                 );
+                                markerDetailsList.add(markerDetails);
                                 setMarkerOnMap(markerDetails);
                             }
                         });
@@ -537,7 +506,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void setMarkerOnMap(PlaceDetails markerDetails) {
-        markerDetailsList.add(markerDetails);
         LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
         if (user != null) {
             userRef.collection("placesVisited")
