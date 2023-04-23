@@ -123,10 +123,6 @@ public class UserProfileActivity extends AppCompatActivity {
         String photoUrl = String.valueOf(user.getPhotoUrl());
         setUserDP(photoUrl);
 
-        // setting recycler view for check in history
-
-
-
     }
 
     void setPlacesVisitedText(String placeID, String count) {
