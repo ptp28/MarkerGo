@@ -9,14 +9,18 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +30,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -55,13 +60,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import edu.northeastern.markergo.models.PlaceDetails;
 import edu.northeastern.markergo.models.VisitationDetails;
+import nl.dionsegijn.konfetti.core.Party;
+import nl.dionsegijn.konfetti.core.PartyFactory;
+import nl.dionsegijn.konfetti.core.emitter.Emitter;
+import nl.dionsegijn.konfetti.core.emitter.EmitterConfig;
+import nl.dionsegijn.konfetti.core.models.Shape;
+import nl.dionsegijn.konfetti.core.models.Size;
+import nl.dionsegijn.konfetti.xml.KonfettiView;
 
 public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
     // maker colour change
+    private LayoutInflater inflater;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private DocumentReference userRef;
@@ -89,11 +103,31 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private CollectionReference markersRef;
     private LatLng pointToBeAdded;
     private Dialog addLocationDialog;
+    private Dialog successDialog;
+    private KonfettiView konfettiView;
+    private Party party;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
+
+        inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_heart);
+        Shape.DrawableShape drawableShape = new Shape.DrawableShape(drawable, true);
+
+        konfettiView = findViewById(R.id.konfettiView);
+        EmitterConfig emitterConfig = new Emitter(2L, TimeUnit.SECONDS).perSecond(400);
+        party = new PartyFactory(emitterConfig)
+                .angle(270)
+                .spread(90)
+                .setSpeed(50f)
+                .timeToLive(4000L)
+                .shapes(new Shape.Rectangle(0.2f), drawableShape)
+                .sizes(new Size(12, 5f, 0.2f))
+                .position(0.0, 0.0, 1.0, 0.0)
+                .build();
 
         fireStoreDB = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -298,8 +332,16 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void showAddLocationDialog() {
+        View content = inflater.inflate(R.layout.alert_dialog, null);
+        TextView titleTV = content.findViewById(R.id.txttite);
+        titleTV.setText("Add new location?");
+        TextView textTV = content.findViewById(R.id.txtDesc);
+        textTV.setVisibility(View.INVISIBLE);
+        Button checkoutBtn = content.findViewById(R.id.btn_checkout);
+        checkoutBtn.setVisibility(View.GONE);
+
         addLocationDialog = new Dialog(this);
-        addLocationDialog.setContentView(R.layout.alert_dialog);
+        addLocationDialog.setContentView(content);
         addLocationDialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_window);
         addLocationDialog.show();
     }
@@ -319,7 +361,13 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void cancelDialog(View view) {
-        addLocationDialog.cancel();
+        if (addLocationDialog != null) {
+            addLocationDialog.cancel();
+        }
+
+        if (successDialog != null) {
+            successDialog.cancel();
+        }
     }
 
     @Override
@@ -329,6 +377,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             PlaceDetails markerDetails = (PlaceDetails) data.getExtras().get("markerDetails");
             System.out.println("id = " + markerDetails.getId());
             setMarkerOnMap(markerDetails);
+            showSuccessDialog(markerDetails);
         } else if (requestCode == VISIT_MARKER_REQUEST_CODE & resultCode == RESULT_OK && data != null) {
             Bundle extras = data.getExtras();
             if ((Boolean) extras.get("checkedIn")) {
@@ -339,6 +388,27 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 addGreenMarker(markerDetails, position);
             }
         }
+    }
+
+    private void showSuccessDialog(PlaceDetails markerDetails) {
+        konfettiView.start(party);
+        View content = inflater.inflate(R.layout.alert_dialog, null);
+        TextView titleTV = content.findViewById(R.id.txttite);
+        titleTV.setText("Location Added!");
+        Button noBtn = content.findViewById(R.id.btn_no);
+        Button yesBtn = content.findViewById(R.id.btn_yes);
+        noBtn.setVisibility(View.GONE);
+        yesBtn.setVisibility(View.GONE);
+        Button checkoutBtn = content.findViewById(R.id.btn_checkout);
+        checkoutBtn.setOnClickListener(v -> {
+            successDialog.cancel();
+            openLocationDetailsActivity(markerDetails);
+        });
+
+        successDialog = new Dialog(this);
+        successDialog.setContentView(content);
+        successDialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_window);
+        successDialog.show();
     }
 
     private void addGreenMarker(PlaceDetails markerDetails, LatLng position) {
@@ -366,8 +436,12 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     public void openLocationDetailsActivity(Marker marker) {
         this.currMarker = marker;
         PlaceDetails markerDetails = (PlaceDetails) marker.getTag();
-        System.out.println(markerDetails.getAddedBy());
         assert markerDetails != null;
+        System.out.println(markerDetails.getAddedBy());
+        openLocationDetailsActivity(markerDetails);
+    }
+
+    private void openLocationDetailsActivity(PlaceDetails markerDetails) {
         userRef
                 .collection("placesVisited")
                 .document(markerDetails.getId())
@@ -391,6 +465,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 })
                 .addOnFailureListener(e -> Toast.makeText(getApplicationContext(), "something went wrong", Toast.LENGTH_SHORT).show());
     }
+
 
     public void populateMarkers() {
         markersRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
