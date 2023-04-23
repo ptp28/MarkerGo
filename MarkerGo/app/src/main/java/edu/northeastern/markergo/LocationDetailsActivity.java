@@ -90,6 +90,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private Location currentLocation;
     private PlaceDetails markerDetails;
     private VisitationDetails visitationDetails;
+    private Map<String, Long> visitationStatsByTime;
     private StorageReference storageRef;
     private StorageReference imagesRef;
     private FirebaseAuth mAuth;
@@ -109,6 +110,11 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private long lastVisited;
     private Dialog dialog;
     private LayoutInflater inflater;
+    private TextView morningVisitationsTV;
+    private TextView afternoonVisitationsTV;
+    private TextView eveningVisitationsTV;
+    private TextView nightVisitationsTV;
+    private TextView textViewStatisticsTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +153,11 @@ public class LocationDetailsActivity extends AppCompatActivity {
         addPhotoTextView = findViewById(R.id.textViewAddPhoto);
         checkInButton = findViewById(R.id.buttonCheckIn);
         lastVisitTextView = findViewById(R.id.textViewLastVisitLabel);
+        morningVisitationsTV = findViewById(R.id.morningVisitations);
+        afternoonVisitationsTV = findViewById(R.id.afternoonVisitations);
+        eveningVisitationsTV = findViewById(R.id.eveningVisitations);
+        nightVisitationsTV = findViewById(R.id.nightVisitations);
+        textViewStatisticsTV = findViewById(R.id.textViewStatistics);
 
 //        drawerLayout = findViewById(R.id.my_drawer_layout);
 //        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
@@ -175,6 +186,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (bundle.containsKey("markerDetails")) {
             markerDetails = (PlaceDetails) bundle.get("markerDetails");
+            visitationStatsByTime = markerDetails.getVisitationStatsByTime();
+
+            setVisitationByTimeText();
 
             if (bundle.containsKey("visitationDetails")) {
                 visitationDetails = (VisitationDetails) bundle.get("visitationDetails");
@@ -208,6 +222,20 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
 
         populateImageList();
+    }
+
+    private void setVisitationByTimeText() {
+        long morning = visitationStatsByTime.get("Morning");
+        long afternoon = visitationStatsByTime.get("Afternoon");
+        long evening = visitationStatsByTime.get("Evening");
+        long night = visitationStatsByTime.get("Night");
+        long sum = morning + afternoon + evening + night;
+
+        morningVisitationsTV.setText(String.valueOf(morning));
+        afternoonVisitationsTV.setText(String.valueOf(afternoon));
+        eveningVisitationsTV.setText(String.valueOf(evening));
+        nightVisitationsTV.setText(String.valueOf(night));
+        textViewStatisticsTV.setText(sum + " people have visited this place");
     }
 
     @Override
@@ -304,10 +332,13 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
     private void updateVisitationStatsForMarker() {
         DocumentReference markerRef = markersCollectionRef.document(markerDetails.getId());
-        String field = "visitationStatsByTime." + getSubfield();
+        String key = getSubfield();
+        String field = "visitationStatsByTime." + key;
 
         markerRef.update(field, FieldValue.increment(1))
                 .addOnFailureListener(e -> Log.i("status", "failed to update visitationStats"));
+        visitationStatsByTime.put(key, visitationStatsByTime.get(key) + 1);
+        setVisitationByTimeText();
     }
 
     private String getSubfield() {

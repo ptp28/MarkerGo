@@ -18,7 +18,7 @@ public class PlaceDetails implements Parcelable {
     private final double latitude;
     private final double longitude;
     private final String description;
-    private final Map<String, Integer> visitationStatsByTime;
+    private final Map<String, Long> visitationStatsByTime;
     private final int visitationsThisWeek;
     private final List<PhotoDetails> photos;
     private final String addedBy;
@@ -42,18 +42,18 @@ public class PlaceDetails implements Parcelable {
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
         this.photos = (ArrayList<PhotoDetails>) in.readSerializable();
-        this.visitationStatsByTime = (HashMap<String, Integer>) in.readSerializable();
+        this.visitationStatsByTime = (HashMap<String, Long>) in.readSerializable();
         this.visitationsThisWeek = in.readInt();
         this.addedBy = in.readString();
     }
 
-    public PlaceDetails(String id, String name, double latitude, double longitude, String description, String addedBy) {
+    public PlaceDetails(String id, String name, double latitude, double longitude, String description, Map<String, Long> visitationStatsByTime, String addedBy) {
         this.id = id;
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.description = description;
-        this.visitationStatsByTime = new HashMap<>();
+        this.visitationStatsByTime = visitationStatsByTime;
         this.visitationsThisWeek = 0;
         this.photos = new ArrayList<>();
         this.addedBy = addedBy;
@@ -73,7 +73,7 @@ public class PlaceDetails implements Parcelable {
 
     public PlaceDetails(String id, String name, double latitude, double longitude,
                         String description,
-                        Map<String, Integer> visitationStatsByTime,
+                        Map<String, Long> visitationStatsByTime,
                         int visitationsThisWeek, List<PhotoDetails> photos, String addedBy) {
         this.id = id;
         this.name = name;
@@ -106,7 +106,7 @@ public class PlaceDetails implements Parcelable {
         return description;
     }
 
-    public Map<String, Integer> getVisitationStatsByTime() {
+    public Map<String, Long> getVisitationStatsByTime() {
         return visitationStatsByTime;
     }
 
