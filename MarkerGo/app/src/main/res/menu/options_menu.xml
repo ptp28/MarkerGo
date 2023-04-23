@@ -4,8 +4,6 @@
     tools:ignore="HardcodedText">
     <item android:id="@+id/profile_item"
         android:title="Profile" />
-    <item android:id="@+id/favourites_item"
-        android:title="Favourites" />
     <item android:id="@+id/logout_item"
         android:title="Logout" />
 </menu>
