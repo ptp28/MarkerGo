@@ -1,5 +1,6 @@
 package edu.northeastern.markergo;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -101,15 +102,16 @@ public class UserProfileActivity extends AppCompatActivity {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     final int[] totalCount = {0};
                     queryDocumentSnapshots.getDocuments().forEach(documentSnapshot -> {
-                        // dont need this
+                        // don't need this
                         setPlacesVisitedText(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count")));
                         Log.i("PLACE", getPlaceVisited(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count"))));
+
                         checkInList.add(getPlaceVisited(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count"))));
                         totalCount[0] += Integer.parseInt(String.valueOf(documentSnapshot.get("count")));
                     });
                     totalCheckIns.setText(String.valueOf(totalCount[0]));
                     if (totalCount[0] == 0) {
-                        checkInHistory.setText(" -  You haven't checked in to any places yet. START MOVING !");
+                        checkInHistory.setText("You haven't checked in to any places yet");
                     }
                 });
 
@@ -139,9 +141,10 @@ public class UserProfileActivity extends AppCompatActivity {
         db.collection("markers").document(placeID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                place.append(" -  ").append(String.valueOf(documentSnapshot.get("name"))).append(", visited - ").append(count).append(" time(s)");
+                place.append(String.valueOf(documentSnapshot.get("name"))).append(", visited - ").append(count).append(" time(s)");
             }
         });
+        Log.i("Returning", place.toString());
         return place.toString();
     }
 

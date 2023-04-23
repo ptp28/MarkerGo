@@ -15,7 +15,6 @@ public class CheckInRecyclerViewAdapter extends RecyclerView.Adapter<CheckInRecy
     List<String> checkInList;
 
     public CheckInRecyclerViewAdapter(List<String> checkInList) {
-        for(String s: checkInList)
         this.checkInList = checkInList;
     }
 
