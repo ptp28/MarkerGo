@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -35,6 +36,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -51,10 +53,13 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private TextView dateOfJoining;
     private TextView totalCheckIns;
+    private TextView points;
     private TextView checkInHistory;
     private static int PICK_IMAGE_REQUEST_CODE = 1;
+    private static int UPDATE_PROFILE_REQUEST_CODE = 2;
     private StorageReference storageRef;
     private StorageReference imagesRef;
+    private DocumentReference userRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,15 +67,19 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_profile);
 
         mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+
         db = FirebaseFirestore.getInstance();
         storageRef = FirebaseStorage.getInstance().getReference();
         imagesRef = storageRef.child("customUserPhotos/");
+        userRef = db.collection("users").document(user.getUid());
 
         username = findViewById(R.id.username);
         email = findViewById(R.id.email);
         userDP = findViewById(R.id.userDP);
         dateOfJoining = findViewById(R.id.dateOfJoining);
         totalCheckIns = findViewById(R.id.totalCheckIns);
+        points = findViewById(R.id.points);
         checkInHistory = findViewById(R.id.checkInHistory);
         checkInHistory.setText("");
         totalCheckIns.setText("0");
@@ -78,27 +87,28 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void setUserDetails() {
-        user = mAuth.getCurrentUser();
-        String uid = user.getUid();
-        System.out.println("UID -> " + uid);
-        assert user != null;
-        db.collection("users").document(uid).collection("placesVisited").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                final int[] totalCount = {0};
-                queryDocumentSnapshots.getDocuments().forEach(new Consumer<DocumentSnapshot>() {
-                    @Override
-                    public void accept(DocumentSnapshot documentSnapshot) {
-                        setPlacesVisitedText(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count")));
-                        totalCount[0] += Integer.parseInt(String.valueOf(String.valueOf(documentSnapshot.get("count"))));
-                    }
-                });
-                totalCheckIns.setText(String.valueOf(totalCount[0]));
-                if(totalCount[0] == 0) {
-                    checkInHistory.setText(" -  You haven't checked in to any places yet. START MOVING !");
-                }
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            Map<String, Object> data = documentSnapshot.getData();
+            if (data == null || !data.containsKey("points")) {
+                points.setText("0");
+            } else {
+                points.setText(String.valueOf(data.get("points")));
             }
         });
+
+        userRef.collection("placesVisited")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    final int[] totalCount = {0};
+                    queryDocumentSnapshots.getDocuments().forEach(documentSnapshot -> {
+                        setPlacesVisitedText(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count")));
+                        totalCount[0] += Integer.parseInt(String.valueOf(documentSnapshot.get("count")));
+                    });
+                    totalCheckIns.setText(String.valueOf(totalCount[0]));
+                    if (totalCount[0] == 0) {
+                        checkInHistory.setText(" -  You haven't checked in to any places yet. START MOVING !");
+                    }
+                });
 
         username.setText(user.getDisplayName());
         email.setText(user.getProviderData().get(1).getEmail());
@@ -149,6 +159,8 @@ public class UserProfileActivity extends AppCompatActivity {
 
             // call only if matches marker location details?
             uploadPhotoToDb(file);
+        } else if (requestCode == UPDATE_PROFILE_REQUEST_CODE) {
+            setUserDP(user.getPhotoUrl().toString());
         }
     }
 
@@ -204,7 +216,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
     public void startEditUserActivity(View view) {
-        startActivity(new Intent(getApplicationContext(), EditUserProfileActivity.class));
+        Intent intent = new Intent(getApplicationContext(), EditUserProfileActivity.class);
+        startActivityForResult(intent, UPDATE_PROFILE_REQUEST_CODE);
     }
-
 }
