@@ -53,7 +53,21 @@
                 android:textColor="@color/colorBlacky"
                 android:textSize="25sp" />
 
+            <TextView
+                android:id="@+id/txtDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:text=""
+                android:textSize="15sp"
+                android:textColor="@color/colorBlacky"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"/>
+
             <LinearLayout
+                android:id="@+id/buttonsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -73,9 +87,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
-                    android:layout_marginLeft="24dp"
                     android:onClick="positiveDialogAction"
                     android:text="Yes" />
+
+                <Button
+                    android:id="@+id/btn_checkout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:onClick="positiveDialogAction"
+                    android:text="Check it out" />
 
             </LinearLayout>
 
