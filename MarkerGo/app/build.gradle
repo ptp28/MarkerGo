@@ -6,16 +6,16 @@ plugins {
 android {
     signingConfigs {
         debug {
-            storeFile file('/Users/tanmaykapoor/Desktop/college/App Dev/keystore/markergo_keystore')
-            storePassword 'Fruitninja!1'
-            keyAlias 'key1'
-            keyPassword 'Fruitninja!1'
+//            storeFile file('/Users/tanmaykapoor/Desktop/college/App Dev/keystore/markergo_keystore')
+//            storePassword 'Fruitninja!1'
+//            keyAlias 'key1'
+//            keyPassword 'Fruitninja!1'
         }
         release {
-            storeFile file('/Users/tanmaykapoor/Desktop/college/App Dev/keystore/markergo_keystore')
-            storePassword 'Fruitninja!1'
-            keyAlias 'key1'
-            keyPassword 'Fruitninja!1'
+//            storeFile file('/Users/tanmaykapoor/Desktop/college/App Dev/keystore/markergo_keystore')
+//            storePassword 'Fruitninja!1'
+//            keyAlias 'key1'
+//            keyPassword 'Fruitninja!1'
         }
     }
     namespace 'edu.northeastern.markergo'
