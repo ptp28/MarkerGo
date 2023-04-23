@@ -77,6 +77,7 @@ import nl.dionsegijn.konfetti.xml.KonfettiView;
 public class landingPage extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
     // maker colour change
     private LayoutInflater inflater;
+
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private DocumentReference userRef;
@@ -194,12 +195,11 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         int height;
         int width;
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            width = (int) (getResources().getDisplayMetrics().widthPixels*0.72);
-            height = (int) (getResources().getDisplayMetrics().heightPixels*0.25);
-        }
-        else{
-            width = (int) (getResources().getDisplayMetrics().widthPixels*0.6);
-            height = (int) (getResources().getDisplayMetrics().heightPixels*0.35);
+            width = (int) (getResources().getDisplayMetrics().widthPixels * 0.72);
+            height = (int) (getResources().getDisplayMetrics().heightPixels * 0.25);
+        } else {
+            width = (int) (getResources().getDisplayMetrics().widthPixels * 0.6);
+            height = (int) (getResources().getDisplayMetrics().heightPixels * 0.35);
         }
         alertDialog.getWindow().setLayout(width, height);
     }
@@ -268,7 +268,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         }).setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
             }
         });
         final AlertDialog alertDialog = builder.create();
@@ -338,16 +337,10 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         switch (requestCode) {
             case FINE_LOCATION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
                     setUpLocationManagerWithPermissions();
-                }
-                else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("The app cannot function without location access. \n" +
-                                    "Please allow the permission to use location services on the next window.")
-                            .setPositiveButton("Ok", (dialog, which) ->
-                                    askToTurnOnGPSInSettings())
-                            .show();
+                } else {
+                    setUpLocationManagerWithPermissions();
                 }
                 break;
         }
