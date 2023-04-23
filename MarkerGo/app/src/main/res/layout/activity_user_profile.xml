@@ -217,6 +217,13 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <include layout="@layout/check_in_history_recycler_view" />
+                </LinearLayout>
+
+
 
             </LinearLayout>
         </LinearLayout>

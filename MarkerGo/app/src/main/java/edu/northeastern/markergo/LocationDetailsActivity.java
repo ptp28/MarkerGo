@@ -31,6 +31,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -76,7 +77,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     RecyclerView.LayoutManager imageGridLayoutManager;
     ImageRecyclerViewAdapter recyclerViewAdapter;
     List<Bitmap> imageList;
-
+    boolean isFirstImage = true;
     List<Uri> imageSources;
     private TextView descriptionTextView;
     private CollapsingToolbarLayout collapsingToolbarLayout;
@@ -249,7 +250,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
         imagesRef.listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference ref : listResult.getItems()) {
-                        ref.getDownloadUrl().addOnSuccessListener(this::addToImageList);
+                        ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                            addToImageList(uri);
+                        });
                     }
                 });
     }
@@ -459,6 +462,10 @@ public class LocationDetailsActivity extends AppCompatActivity {
         try {
             thread.join();
             Bitmap image = whatever.getImageBitmap();
+            if (isFirstImage) {
+                isFirstImage = false;
+                setToolbarImage(image);
+            }
             imageSources.add(uri);
             imageList.add(image);
             recyclerViewAdapter.notifyItemInserted(imageList.size());

@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "402284194754-iqgt24d2oq6ansgl53jjdprjqm31pbni.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.northeastern.markergo",
+            "certificate_hash": "1cf76613f4b5d6365aa9467f0006f336f6f68cfa"
+          }
+        },
+        {
           "client_id": "402284194754-oh82g5eclr3nima1mva2o1vlsf85j8hq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
