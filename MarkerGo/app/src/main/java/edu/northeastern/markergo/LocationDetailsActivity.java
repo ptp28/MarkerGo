@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -295,6 +296,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
     private void showFailedCheckInDialog() {
         View content = inflater.inflate(R.layout.alert_dialog, null);
+        ImageView imageIcon = content.findViewById(R.id.img_icon);
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.alert_triangle);
+        imageIcon.setImageBitmap(icon);
         TextView titleTV = content.findViewById(R.id.txttite);
         titleTV.setText("Failed Check-in!");
         TextView textTV = (TextView) content.findViewById(R.id.txtDesc);
