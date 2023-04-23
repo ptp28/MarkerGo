@@ -27,7 +27,8 @@
                     android:layout_height="match_parent"
                     app:collapsedTitleTextColor="?attr/colorOnPrimary"
                     app:contentScrim="?attr/colorPrimary"
-                    app:expandedTitleTextColor="@color/white"
+                    app:expandedTitleTextAppearance="@style/ExpandedText"
+
                     app:layout_scrollFlags="scroll|exitUntilCollapsed"
                     app:layout_scrollInterpolator="@android:anim/decelerate_interpolator"
                     app:title="Sample Place Name"
@@ -38,11 +39,12 @@
                         android:id="@+id/app_bar_image"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-
                         android:scaleType="centerCrop"
-                        android:src="@drawable/lake"
-                        app:srcCompat="@drawable/lake"
-                        tools:srcCompat="@drawable/lake" />
+                        app:tint="#3F000000"
+                        android:tintMode="src_atop"
+                        android:src="@drawable/image_palceholder"
+                        app:srcCompat="@drawable/image_palceholder"
+                        tools:srcCompat="@drawable/image_palceholder" />
 
                     <androidx.appcompat.widget.Toolbar
                         android:id="@+id/toolbar"

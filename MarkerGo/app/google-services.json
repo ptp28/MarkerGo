@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "402284194754-6f00shb5a11jb71ad2s23rsdbmijc6vp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.northeastern.markergo",
+            "certificate_hash": "323572c4071c8f12bcdf395b491678d92f986e43"
+          }
+        },
+        {
+          "client_id": "402284194754-oh82g5eclr3nima1mva2o1vlsf85j8hq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.northeastern.markergo",
+            "certificate_hash": "5c742b1cfb849861e70e5d94d63710e43e1ad925"
+          }
+        },
+        {
           "client_id": "402284194754-tpc11ntj84kgcphf9h0ba6bbn7nijltb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

@@ -135,6 +135,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         fireStoreDB = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+
         userRef = fireStoreDB.collection("users").document(user.getUid());
         markersRef = fireStoreDB.collection("markers");
         markerDetailsList = new ArrayList<>();
@@ -490,6 +491,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                                         (String) documentSnapshot.get("description"),
                                         (String) documentSnapshot.get("addedBy")
                                 );
+                                markerDetailsList.add(markerDetails);
                                 setMarkerOnMap(markerDetails);
                             }
                         });
@@ -504,7 +506,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void setMarkerOnMap(PlaceDetails markerDetails) {
-        markerDetailsList.add(markerDetails);
         LatLng latLng = new LatLng(markerDetails.getLatitude(), markerDetails.getLongitude());
         if (user != null) {
             userRef.collection("placesVisited")
