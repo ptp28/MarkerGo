@@ -129,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(intent);
                         super.finish();
                     } else {
-                        displayToast("Authentication failed");
+                        displayToast("Authentication failed. Please check if your email or password is correct");
                     }
                 });
     }
