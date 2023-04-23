@@ -1,6 +1,7 @@
 package edu.northeastern.markergo;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -84,6 +87,8 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private List<PlaceDetails> markerDetailsList;
     private Marker currMarker;
     private CollectionReference markersRef;
+    private LatLng pointToBeAdded;
+    private Dialog addLocationDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -278,17 +283,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onMapLongClick(LatLng point) {
-        userRef.get().addOnSuccessListener(documentSnapshot -> {
-            Map<String, Object> data = documentSnapshot.getData();
-            if (data != null && data.containsKey("points") && (long) data.get("points") >= 500) {
-                displayAlertDialog(point);
-            } else {
-                Toast.makeText(getApplicationContext(), "You need at-least 500 points to add a new location", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void displayAlertDialog(LatLng point) {
+        pointToBeAdded = point;
         markersRef
                 .whereEqualTo("latitude", point.latitude)
                 .whereEqualTo("longitude", point.longitude)
@@ -298,28 +293,33 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                         return;
                     }
 
-                    AlertDialog.Builder build = new AlertDialog.Builder(this);
-                    build.setTitle("New Location Add");
-                    build.setMessage("Do you wanna request addition of a new location?")
-                            .setCancelable(false).setPositiveButton("Yes", (dialogInterface, i) -> {
-                                Intent intent = new Intent(landingPage.this, newLocation.class);
-                                intent.putExtra("location", point);
-                                startActivityForResult(intent, ADD_MARKER_REQUEST_CODE);
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.cancel();
-                                }
-                            });
-                    AlertDialog alertDialog = build.create();
-                    alertDialog.show();
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                    alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-                    int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.7);
-                    int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.32);
-                    alertDialog.getWindow().setLayout(width, height);
+                    showAddLocationDialog();
                 });
+    }
+
+    private void showAddLocationDialog() {
+        addLocationDialog = new Dialog(this);
+        addLocationDialog.setContentView(R.layout.alert_dialog);
+        addLocationDialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_window);
+        addLocationDialog.show();
+    }
+
+    public void positiveDialogAction(View view) {
+        addLocationDialog.cancel();
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            Map<String, Object> data = documentSnapshot.getData();
+            if (data != null && data.containsKey("points") && (long) data.get("points") >= 500) {
+                Intent intent = new Intent(landingPage.this, newLocation.class);
+                intent.putExtra("location", pointToBeAdded);
+                startActivityForResult(intent, ADD_MARKER_REQUEST_CODE);
+            } else {
+                Toast.makeText(getApplicationContext(), "You need at-least 500 points to add a new location", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public void cancelDialog(View view) {
+        addLocationDialog.cancel();
     }
 
     @Override

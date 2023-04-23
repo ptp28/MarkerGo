@@ -349,7 +349,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     void showDialog(String text) {
-        View content = inflater.inflate(R.layout.layout_custom_dialog, null);
+        View content = inflater.inflate(R.layout.points_dialog, null);
         TextView tv = (TextView) content.findViewById(R.id.txtDesc);
         tv.setText(text);
 
