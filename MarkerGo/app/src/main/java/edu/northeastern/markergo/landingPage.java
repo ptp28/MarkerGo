@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -132,7 +133,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onBackPressed() {
         AlertDialog.Builder build = new AlertDialog.Builder(this);
-        build.setTitle("EXIT");
+//        build.setTitle("EXIT");
         build.setMessage("Are you sure you want to exit?")
                 .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
@@ -151,8 +152,16 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-        int width = (int) (getResources().getDisplayMetrics().widthPixels*0.7);
-        int height = (int) (getResources().getDisplayMetrics().heightPixels*0.32);
+        int height;
+        int width;
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            width = (int) (getResources().getDisplayMetrics().widthPixels*0.72);
+            height = (int) (getResources().getDisplayMetrics().heightPixels*0.2);
+        }
+        else{
+            width = (int) (getResources().getDisplayMetrics().widthPixels*0.6);
+            height = (int) (getResources().getDisplayMetrics().heightPixels*0.32);
+        }
         alertDialog.getWindow().setLayout(width,height);
     }
 
