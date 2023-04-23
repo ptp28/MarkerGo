@@ -80,6 +80,12 @@ public class UserProfileActivity extends AppCompatActivity {
         dateOfJoining = findViewById(R.id.dateOfJoining);
         totalCheckIns = findViewById(R.id.totalCheckIns);
         points = findViewById(R.id.points);
+
+        checkInAdapter = new CheckInRecyclerViewAdapter(checkInList);
+        checkInHistoryRV = findViewById(R.id.checkInHistoryRV);
+        checkInHistoryRV.setLayoutManager(new LinearLayoutManager(this));
+        checkInHistoryRV.setAdapter(checkInAdapter);
+
         checkInHistory = findViewById(R.id.checkInHistory);
         checkInHistory.setText("");
         totalCheckIns.setText("0");
@@ -102,11 +108,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     final int[] totalCount = {0};
                     queryDocumentSnapshots.getDocuments().forEach(documentSnapshot -> {
-                        // don't need this
                         setPlacesVisitedText(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count")));
-                        Log.i("PLACE", getPlaceVisited(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count"))));
-
-                        checkInList.add(getPlaceVisited(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count"))));
                         totalCount[0] += Integer.parseInt(String.valueOf(documentSnapshot.get("count")));
                     });
                     totalCheckIns.setText(String.valueOf(totalCount[0]));
@@ -122,37 +124,19 @@ public class UserProfileActivity extends AppCompatActivity {
         setUserDP(photoUrl);
 
         // setting recycler view for check in history
-        checkInList.add("hello");
-        checkInList.add("adsfads");
-        checkInList.add("heladsfasdfsdaflo");
-        checkInList.add("he323llo");
-        checkInList.add("adadfasd");
-        checkInList.add("vbncvbcb");
-        checkInAdapter = new CheckInRecyclerViewAdapter(checkInList);
-        checkInHistoryRV = findViewById(R.id.checkInHistoryRV);
-        checkInHistoryRV.setLayoutManager(new LinearLayoutManager(this));
-        checkInHistoryRV.setAdapter(checkInAdapter);
+
+
 
     }
 
-    private String getPlaceVisited(String placeID, String count) {
-        StringBuilder place = new StringBuilder("");
-
-        db.collection("markers").document(placeID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                place.append(String.valueOf(documentSnapshot.get("name"))).append(", visited - ").append(count).append(" time(s)");
-            }
-        });
-        Log.i("Returning", place.toString());
-        return place.toString();
-    }
-
-    // dont need this one
     void setPlacesVisitedText(String placeID, String count) {
         db.collection("markers").document(placeID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
+                StringBuilder place = new StringBuilder("");
+                place.append(String.valueOf(documentSnapshot.get("name"))).append(", visited - ").append(count).append(" time(s)");
+                checkInList.add(place.toString());
+                checkInAdapter.notifyItemInserted(checkInList.size());
                 checkInHistory.append(" -  " + String.valueOf(documentSnapshot.get("name")) + ", visited - " + count + " time(s).\n");
             }
         });
