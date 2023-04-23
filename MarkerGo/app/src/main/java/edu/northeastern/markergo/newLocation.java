@@ -111,7 +111,8 @@ public class newLocation extends AppCompatActivity {
         newLocation.put("latitude", point.latitude);
         newLocation.put("longitude", point.longitude);
         newLocation.put("description", description);
-        newLocation.put("visitationStatsByTime", getStats());
+        Map<String, Long> visitationStatsByTime = getStats();
+        newLocation.put("visitationStatsByTime", visitationStatsByTime);
         newLocation.put("visitationsThisWeek", 0);
         newLocation.put("photos", new ArrayList<>());
         newLocation.put("addedBy", user.getUid());
@@ -119,7 +120,7 @@ public class newLocation extends AppCompatActivity {
         markersRef.add(newLocation).addOnSuccessListener(documentReference -> {
             String id = documentReference.getId();
             Intent data = new Intent();
-            PlaceDetails markerDetails = new PlaceDetails(id, location, point.latitude, point.longitude, description, addedBy);
+            PlaceDetails markerDetails = new PlaceDetails(id, location, point.latitude, point.longitude, description, visitationStatsByTime, addedBy);
             data.putExtra("markerDetails", (Parcelable) markerDetails);
             setResult(RESULT_OK, data);
             userRef.update("points", FieldValue.increment(-500));
@@ -131,12 +132,12 @@ public class newLocation extends AppCompatActivity {
         dialog.cancel();
     }
 
-    private Map<String, Integer> getStats() {
-        Map<String, Integer> stats = new HashMap<>();
-        stats.put("Morning", 0);
-        stats.put("Afternoon", 0);
-        stats.put("Evening", 0);
-        stats.put("Night", 0);
+    private Map<String, Long> getStats() {
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("Morning", 0L);
+        stats.put("Afternoon", 0L);
+        stats.put("Evening", 0L);
+        stats.put("Night", 0L);
         return stats;
     }
 }
