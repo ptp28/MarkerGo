@@ -156,11 +156,11 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         int width;
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             width = (int) (getResources().getDisplayMetrics().widthPixels*0.72);
-            height = (int) (getResources().getDisplayMetrics().heightPixels*0.2);
+            height = (int) (getResources().getDisplayMetrics().heightPixels*0.25);
         }
         else{
             width = (int) (getResources().getDisplayMetrics().widthPixels*0.6);
-            height = (int) (getResources().getDisplayMetrics().heightPixels*0.32);
+            height = (int) (getResources().getDisplayMetrics().heightPixels*0.35);
         }
         alertDialog.getWindow().setLayout(width,height);
     }
