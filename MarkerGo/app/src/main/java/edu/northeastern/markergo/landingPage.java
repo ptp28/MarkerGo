@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -166,8 +167,37 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onBackPressed() {
-        landingPage.this.finish();
-        System.exit(0);
+        AlertDialog.Builder build = new AlertDialog.Builder(this);
+//        build.setTitle("EXIT");
+        build.setMessage("Are you sure you want to exit?")
+                .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        landingPage.this.finish();
+                        System.exit(0);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        AlertDialog alertDialog = build.create();
+        alertDialog.show();
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        int height;
+        int width;
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            width = (int) (getResources().getDisplayMetrics().widthPixels*0.72);
+            height = (int) (getResources().getDisplayMetrics().heightPixels*0.25);
+        }
+        else{
+            width = (int) (getResources().getDisplayMetrics().widthPixels*0.6);
+            height = (int) (getResources().getDisplayMetrics().heightPixels*0.35);
+        }
+        alertDialog.getWindow().setLayout(width,height);
     }
 
     @Override
@@ -465,7 +495,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 })
                 .addOnFailureListener(e -> Toast.makeText(getApplicationContext(), "something went wrong", Toast.LENGTH_SHORT).show());
     }
-
 
     public void populateMarkers() {
         markersRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
