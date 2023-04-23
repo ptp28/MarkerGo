@@ -17,7 +17,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -132,8 +131,29 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onBackPressed() {
-        landingPage.this.finish();
-        System.exit(0);
+        AlertDialog.Builder build = new AlertDialog.Builder(this);
+        build.setTitle("EXIT");
+        build.setMessage("Are you sure you want to exit?")
+                .setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        landingPage.this.finish();
+                        System.exit(0);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        AlertDialog alertDialog = build.create();
+        alertDialog.show();
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        int width = (int) (getResources().getDisplayMetrics().widthPixels*0.7);
+        int height = (int) (getResources().getDisplayMetrics().heightPixels*0.32);
+        alertDialog.getWindow().setLayout(width,height);
     }
 
     @Override
