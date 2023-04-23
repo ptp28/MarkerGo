@@ -305,7 +305,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     public void positiveDialogAction(View view) {
-        addLocationDialog.cancel();
+        addLocationDialog.dismiss();
         userRef.get().addOnSuccessListener(documentSnapshot -> {
             Map<String, Object> data = documentSnapshot.getData();
             if (data != null && data.containsKey("points") && (long) data.get("points") >= 500) {
