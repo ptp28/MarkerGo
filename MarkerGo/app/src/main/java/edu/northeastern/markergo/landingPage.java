@@ -103,15 +103,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         markerDetailsList = new ArrayList<>();
         populateMarkers();
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-                currentLocation = location;
-                UpdateCurrentLocation();
-            }
-        };
-        askRequiredLocationPermissions();
+        setUpLocationManagerWithPermissions();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -128,6 +120,18 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         // to make the Navigation drawer icon always appear on the action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+    }
+
+    private void setUpLocationManagerWithPermissions() {
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                currentLocation = location;
+                UpdateCurrentLocation();
+            }
+        };
+        askRequiredLocationPermissions();
     }
 
     @Override
@@ -155,14 +159,13 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
         int height;
         int width;
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            width = (int) (getResources().getDisplayMetrics().widthPixels*0.72);
-            height = (int) (getResources().getDisplayMetrics().heightPixels*0.2);
+            width = (int) (getResources().getDisplayMetrics().widthPixels * 0.72);
+            height = (int) (getResources().getDisplayMetrics().heightPixels * 0.2);
+        } else {
+            width = (int) (getResources().getDisplayMetrics().widthPixels * 0.6);
+            height = (int) (getResources().getDisplayMetrics().heightPixels * 0.32);
         }
-        else{
-            width = (int) (getResources().getDisplayMetrics().widthPixels*0.6);
-            height = (int) (getResources().getDisplayMetrics().heightPixels*0.32);
-        }
-        alertDialog.getWindow().setLayout(width,height);
+        alertDialog.getWindow().setLayout(width, height);
     }
 
     @Override
@@ -216,12 +219,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void requestFineLocationPermission() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("The app will need to access location to display latitude and longitude. " +
-                        "Please allow the permission to use location services on the next window.")
-                .setPositiveButton("Ok", (dialog, which) ->
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_REQUEST_CODE))
-                .show();
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_REQUEST_CODE);
     }
 
     private void askToTurnOnGPSInSettings() {
@@ -305,6 +303,15 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
             case FINE_LOCATION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
+                    setUpLocationManagerWithPermissions();
+                }
+                else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("The app cannot function without location access. \n" +
+                                    "Please allow the permission to use location services on the next window.")
+                            .setPositiveButton("Ok", (dialog, which) ->
+                                    askToTurnOnGPSInSettings())
+                            .show();
                 }
                 break;
         }
