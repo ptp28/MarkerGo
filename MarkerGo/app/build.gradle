@@ -4,6 +4,20 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('/Users/tanmaykapoor/Desktop/college/App Dev/keystore/markergo_keystore')
+            storePassword 'Fruitninja!1'
+            keyAlias 'key1'
+            keyPassword 'Fruitninja!1'
+        }
+        release {
+            storeFile file('/Users/tanmaykapoor/Desktop/college/App Dev/keystore/markergo_keystore')
+            storePassword 'Fruitninja!1'
+            keyAlias 'key1'
+            keyPassword 'Fruitninja!1'
+        }
+    }
     namespace 'edu.northeastern.markergo'
     compileSdk 33
 
@@ -15,6 +29,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
 
     dataBinding { enabled = true }
