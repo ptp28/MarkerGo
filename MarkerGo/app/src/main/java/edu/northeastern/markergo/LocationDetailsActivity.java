@@ -72,6 +72,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
     RecyclerView.LayoutManager imageGridLayoutManager;
     ImageRecyclerViewAdapter recyclerViewAdapter;
     List<Bitmap> imageList;
+
+    List<Uri> imageSources;
     private TextView descriptionTextView;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private ImageView appbarCoverImage;
@@ -195,6 +197,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         }
 
         imageList = new ArrayList<>();
+        imageSources = new ArrayList<>();
         recyclerViewAdapter = new ImageRecyclerViewAdapter(imageList);
         recyclerViewImages.setAdapter(recyclerViewAdapter);
 
@@ -254,12 +257,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     private void populateImageList() {
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
-        imageList.add(BitmapFactory.decodeResource(getResources(), R.drawable.fort));
         imagesRef.listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference ref : listResult.getItems()) {
@@ -377,7 +374,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             Intent photoRecyclerIntent = new Intent(getApplicationContext(), AllLocationPhotosActivity.class);
-            photoRecyclerIntent.putExtra("AllImages", (Serializable) imageList);
+            photoRecyclerIntent.putExtra("AllImagesSources", (Serializable) imageSources);
             startActivity(photoRecyclerIntent);
         }
     };
@@ -455,6 +452,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         try {
             thread.join();
             Bitmap image = whatever.getImageBitmap();
+            imageSources.add(uri);
             imageList.add(image);
             recyclerViewAdapter.notifyItemInserted(imageList.size());
         } catch (InterruptedException e) {
