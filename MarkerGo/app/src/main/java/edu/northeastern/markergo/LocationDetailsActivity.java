@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -288,8 +289,23 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "sign in to update stuff on firebase", Toast.LENGTH_SHORT).show();
             }
         } else {
-            Toast.makeText(getApplicationContext(), "failed. not within 100m", Toast.LENGTH_SHORT).show();
+            showFailedCheckInDialog();
         }
+    }
+
+    private void showFailedCheckInDialog() {
+        View content = inflater.inflate(R.layout.alert_dialog, null);
+        TextView titleTV = content.findViewById(R.id.txttite);
+        titleTV.setText("Failed Check-in!");
+        TextView textTV = (TextView) content.findViewById(R.id.txtDesc);
+        textTV.setText("Oops! Looks like you are more than 100m away from this location.\nPlease try again when yo are within 100m.");
+        LinearLayout buttonsLayout = content.findViewById(R.id.buttonsLayout);
+        buttonsLayout.setVisibility(View.GONE);
+
+        dialog = new Dialog(this);
+        dialog.setContentView(content);
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_window);
+        dialog.show();
     }
 
     private void updateVisitationStatsForMarker() {
@@ -338,16 +354,16 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     private void showPointsEarnedDialog() {
-        showDialog("You received 100 points for checking in to this place!");
+        showPointsDialog("You received 100 points for checking in to this place!");
     }
 
     private void showNoPointsEarnedDialog() {
-        showDialog("You did not receive points since your latest check-in for this place is today.");
+        showPointsDialog("You did not receive points since your latest check-in for this place is today.");
     }
 
-    void showDialog(String text) {
+    void showPointsDialog(String text) {
         View content = inflater.inflate(R.layout.points_dialog, null);
-        TextView tv = (TextView) content.findViewById(R.id.txtDesc);
+        TextView tv = content.findViewById(R.id.txtDesc);
         tv.setText(text);
 
         dialog = new Dialog(this);
