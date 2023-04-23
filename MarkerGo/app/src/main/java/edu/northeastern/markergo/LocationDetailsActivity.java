@@ -1,5 +1,7 @@
 package edu.northeastern.markergo;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -10,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -77,7 +80,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private TextView lastVisitTextView;
     private Button getDirectionsButton;
     private Button checkInButton;
-
     private Location currentLocation;
     private PlaceDetails markerDetails;
     private VisitationDetails visitationDetails;
@@ -98,6 +100,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private KonfettiView konfettiView;
     private Party party;
     private long lastVisited;
+    private Dialog dialog;
+    private LayoutInflater inflater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,16 +120,17 @@ public class LocationDetailsActivity extends AppCompatActivity {
         Shape.DrawableShape drawableShape = new Shape.DrawableShape(drawable, true);
 
         konfettiView = findViewById(R.id.konfettiView);
-        EmitterConfig emitterConfig = new Emitter(2L, TimeUnit.SECONDS).perSecond(200);
+        EmitterConfig emitterConfig = new Emitter(2L, TimeUnit.SECONDS).perSecond(400);
         party = new PartyFactory(emitterConfig)
                 .angle(270)
                 .spread(90)
                 .setSpeed(50f)
-                .timeToLive(3000L)
+                .timeToLive(4000L)
                 .shapes(new Shape.Rectangle(0.2f), drawableShape)
                 .sizes(new Size(12, 5f, 0.2f))
                 .position(0.0, 0.0, 1.0, 0.0)
                 .build();
+        inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         descriptionTextView = findViewById(R.id.textViewDescription);
         collapsingToolbarLayout = findViewById(R.id.CollapsingToolbarLayout);
@@ -325,13 +330,37 @@ public class LocationDetailsActivity extends AppCompatActivity {
                             newDate.getMonth() != oldDate.getMonth() ||
                             newDate.getDayOfMonth() != oldDate.getDayOfMonth()) {
                         konfettiView.start(party);
+                        showPointsEarnedDialog();
                         userRef.update("points", FieldValue.increment(100));
                         // display box of points gained and total points
                     } else {
-                        Toast.makeText(getApplicationContext(), "no points earned", Toast.LENGTH_SHORT).show();
+                        showNoPointsEarnedDialog();
                     }
                 })
                 .addOnFailureListener(e -> Log.i("status", "failed to check-in on firebase"));
+    }
+
+    private void showPointsEarnedDialog() {
+        showDialog("You received 100 points for checking in to this place!");
+    }
+
+    private void showNoPointsEarnedDialog() {
+        showDialog("You did not receive points since your latest check-in for this place is today.");
+    }
+
+    void showDialog(String text) {
+        View content = inflater.inflate(R.layout.layout_custom_dialog, null);
+        TextView tv = (TextView) content.findViewById(R.id.txtDesc);
+        tv.setText(text);
+
+        dialog = new Dialog(this);
+        dialog.setContentView(content);
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_window);
+        dialog.show();
+    }
+
+    public void cancelDialog(View view) {
+        dialog.cancel();
     }
 
     View.OnClickListener getDirectionsListener = new View.OnClickListener() {
