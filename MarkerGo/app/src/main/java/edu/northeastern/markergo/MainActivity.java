@@ -3,11 +3,22 @@ package edu.northeastern.markergo;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -107,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 //
 //                data.put("visitationsThisWeek", 0);
 //                data.put("photos", new ArrayList<>());
-//                data.put("addedBy", "sPevFgcG55cIUoWUIN85a0GzqV32");
+//                data.put("addedBy", "XVYEveHBYscKtrAc66xTWDTYWH22");
 //
 //                int finalCnt = cnt;
 //                db.collection("markers")

@@ -23,6 +23,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/morningVisitations"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:padding="10dp"
@@ -51,6 +52,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/afternoonVisitations"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:padding="10dp"
@@ -79,6 +81,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/eveningVisitations"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:padding="10dp"
@@ -107,6 +110,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/nightVisitations"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:padding="10dp"

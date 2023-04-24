@@ -73,7 +73,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
 
         String providerType = user.getProviderData().get(1).getProviderId();
-        if(providerType.equals("google.com") || providerType.equals("facebook.com")) {
+        if (providerType.equals("google.com") || providerType.equals("facebook.com")) {
             changePasswordBtn.setVisibility(View.INVISIBLE);
         }
     }
@@ -131,8 +131,17 @@ public class EditUserProfileActivity extends AppCompatActivity {
         String uid = user.getUid();
         System.out.println("UID -> " + uid);
 
+        String newName = usernameInput.getText().toString();
+        if (newName.isEmpty()) {
+            usernameInput.setError("Name cannot be empty");
+            return;
+        }
+        if (user.getDisplayName() != null && user.getDisplayName().equals(newName)) {
+            return;
+        }
+
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(usernameInput.getText().toString())
+                .setDisplayName(newName)
                 .build();
         assert user != null;
         user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
@@ -146,7 +155,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
 
-                            Toast.makeText(getApplicationContext(),"User update successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "User update successfully", Toast.LENGTH_SHORT).show();
                         });
             } else {
                 Toast.makeText(getApplicationContext(), "Error in updating user profile", Toast.LENGTH_SHORT).show();

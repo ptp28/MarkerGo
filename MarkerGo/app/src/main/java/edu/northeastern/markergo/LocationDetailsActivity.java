@@ -38,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -80,6 +81,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     boolean isFirstImage = true;
     List<Uri> imageSources;
     private TextView descriptionTextView;
+    private TextView addedByTextView;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private ImageView appbarCoverImage;
     private TextView seeAllPhotosLinkTextView;
@@ -90,6 +92,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private Location currentLocation;
     private PlaceDetails markerDetails;
     private VisitationDetails visitationDetails;
+    private Map<String, Long> visitationStatsByTime;
     private StorageReference storageRef;
     private StorageReference imagesRef;
     private FirebaseAuth mAuth;
@@ -109,6 +112,11 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private long lastVisited;
     private Dialog dialog;
     private LayoutInflater inflater;
+    private TextView morningVisitationsTV;
+    private TextView afternoonVisitationsTV;
+    private TextView eveningVisitationsTV;
+    private TextView nightVisitationsTV;
+    private TextView textViewStatisticsTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +147,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 .build();
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        addedByTextView = findViewById(R.id.textViewAddedBy);
         descriptionTextView = findViewById(R.id.textViewDescription);
         collapsingToolbarLayout = findViewById(R.id.CollapsingToolbarLayout);
         appbarCoverImage = findViewById(R.id.app_bar_image);
@@ -147,6 +156,11 @@ public class LocationDetailsActivity extends AppCompatActivity {
         addPhotoTextView = findViewById(R.id.textViewAddPhoto);
         checkInButton = findViewById(R.id.buttonCheckIn);
         lastVisitTextView = findViewById(R.id.textViewLastVisitLabel);
+        morningVisitationsTV = findViewById(R.id.morningVisitations);
+        afternoonVisitationsTV = findViewById(R.id.afternoonVisitations);
+        eveningVisitationsTV = findViewById(R.id.eveningVisitations);
+        nightVisitationsTV = findViewById(R.id.nightVisitations);
+        textViewStatisticsTV = findViewById(R.id.textViewStatistics);
 
 //        drawerLayout = findViewById(R.id.my_drawer_layout);
 //        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
@@ -175,6 +189,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (bundle.containsKey("markerDetails")) {
             markerDetails = (PlaceDetails) bundle.get("markerDetails");
+            visitationStatsByTime = markerDetails.getVisitationStatsByTime();
+
+            setVisitationByTimeText();
 
             if (bundle.containsKey("visitationDetails")) {
                 visitationDetails = (VisitationDetails) bundle.get("visitationDetails");
@@ -187,6 +204,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
             }
 
             imagesRef = storageRef.child(markerDetails.getName() + "/");
+            this.setAddedBy(markerDetails.getAddedBy());
             this.setDescription(markerDetails.getDescription());
             this.setToolbarTitle(markerDetails.getName());
         } else {
@@ -208,6 +226,20 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
 
         populateImageList();
+    }
+
+    private void setVisitationByTimeText() {
+        long morning = visitationStatsByTime.get("Morning");
+        long afternoon = visitationStatsByTime.get("Afternoon");
+        long evening = visitationStatsByTime.get("Evening");
+        long night = visitationStatsByTime.get("Night");
+        long sum = morning + afternoon + evening + night;
+
+        morningVisitationsTV.setText(String.valueOf(morning));
+        afternoonVisitationsTV.setText(String.valueOf(afternoon));
+        eveningVisitationsTV.setText(String.valueOf(evening));
+        nightVisitationsTV.setText(String.valueOf(night));
+        textViewStatisticsTV.setText(sum + " people have visited this place");
     }
 
     @Override
@@ -257,6 +289,16 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 });
     }
 
+    private void setAddedBy(String addedBy) {
+        usersCollectionRef.document(addedBy).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Map<String, Object> data = documentSnapshot.getData();
+                addedByTextView.setText(String.valueOf(data.get("name")));
+            }
+        });
+    }
+
     private void setDescription(String description) {
         descriptionTextView.setText(description);
     }
@@ -304,10 +346,13 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
     private void updateVisitationStatsForMarker() {
         DocumentReference markerRef = markersCollectionRef.document(markerDetails.getId());
-        String field = "visitationStatsByTime." + getSubfield();
+        String key = getSubfield();
+        String field = "visitationStatsByTime." + key;
 
         markerRef.update(field, FieldValue.increment(1))
                 .addOnFailureListener(e -> Log.i("status", "failed to update visitationStats"));
+        visitationStatsByTime.put(key, visitationStatsByTime.get(key) + 1);
+        setVisitationByTimeText();
     }
 
     private String getSubfield() {

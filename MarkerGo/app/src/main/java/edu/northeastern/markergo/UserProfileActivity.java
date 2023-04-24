@@ -1,6 +1,5 @@
 package edu.northeastern.markergo;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import edu.northeastern.markergo.models.CheckInHistory;
 import edu.northeastern.markergo.utils.UrlToBitmap;
 
 public class UserProfileActivity extends AppCompatActivity {
@@ -46,7 +46,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private TextView username;
     private TextView email;
     private ImageView userDP;
-    List<String> checkInList = new ArrayList<>();
+    List<CheckInHistory> checkInList = new ArrayList<>();
 
 
     private TextView dateOfJoining;
@@ -108,7 +108,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     final int[] totalCount = {0};
                     queryDocumentSnapshots.getDocuments().forEach(documentSnapshot -> {
-                        setPlacesVisitedText(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count")));
+                        setPlacesVisitedText(documentSnapshot.getId(), String.valueOf(documentSnapshot.get("count")), String.valueOf(documentSnapshot.get("lastVisited")));
                         totalCount[0] += Integer.parseInt(String.valueOf(documentSnapshot.get("count")));
                     });
                     totalCheckIns.setText(String.valueOf(totalCount[0]));
@@ -123,21 +123,17 @@ public class UserProfileActivity extends AppCompatActivity {
         String photoUrl = String.valueOf(user.getPhotoUrl());
         setUserDP(photoUrl);
 
-        // setting recycler view for check in history
-
-
-
     }
 
-    void setPlacesVisitedText(String placeID, String count) {
+    void setPlacesVisitedText(String placeID, String count, String lastVisited) {
+        checkInHistory.setVisibility(View.INVISIBLE);
         db.collection("markers").document(placeID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 StringBuilder place = new StringBuilder("");
                 place.append(String.valueOf(documentSnapshot.get("name"))).append(", visited - ").append(count).append(" time(s)");
-                checkInList.add(place.toString());
+                checkInList.add(new CheckInHistory(String.valueOf(documentSnapshot.get("name")), count, lastVisited, placeID, null));
                 checkInAdapter.notifyItemInserted(checkInList.size());
-                checkInHistory.append(" -  " + String.valueOf(documentSnapshot.get("name")) + ", visited - " + count + " time(s).\n");
             }
         });
     }
