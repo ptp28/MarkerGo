@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -162,13 +161,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
         nightVisitationsTV = findViewById(R.id.nightVisitations);
         textViewStatisticsTV = findViewById(R.id.textViewStatistics);
 
-//        drawerLayout = findViewById(R.id.my_drawer_layout);
-//        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
-//        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-//        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
-//        actionBarDrawerToggle.syncState();
-//        navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        setupDrawerContent(navigationView);
 
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -245,7 +237,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu2, menu);
+        inflater.inflate(R.menu.options_menu, menu);
         return true;
     }
 
@@ -259,9 +251,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 mAuth.signOut();
                 Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(LocationDetailsActivity.this, MainActivity.class));
-                return true;
-            case R.id.home_item:
-                startActivity(new Intent(LocationDetailsActivity.this, landingPage.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
