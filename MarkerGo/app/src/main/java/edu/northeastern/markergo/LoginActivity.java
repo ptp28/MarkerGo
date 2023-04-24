@@ -98,6 +98,11 @@ public class LoginActivity extends AppCompatActivity {
         String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
 
+        if(email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Enter valid credentials!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         credential = EmailAuthProvider.getCredential(email, password);
         authenticate(credential);
     }
