@@ -25,6 +25,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -130,10 +131,36 @@ public class UserProfileActivity extends AppCompatActivity {
         db.collection("markers").document(placeID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
+                String name = String.valueOf(documentSnapshot.get("name"));
                 StringBuilder place = new StringBuilder("");
-                place.append(String.valueOf(documentSnapshot.get("name"))).append(", visited - ").append(count).append(" time(s)");
-                checkInList.add(new CheckInHistory(String.valueOf(documentSnapshot.get("name")), count, lastVisited, placeID, null));
-                checkInAdapter.notifyItemInserted(checkInList.size());
+                place.append(name).append(", visited - ").append(count).append(" time(s)");
+
+                StorageReference currRef = storageRef.child(name + "/");
+                currRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
+                    @Override
+                    public void onSuccess(ListResult listResult) {
+                        List<StorageReference> list = listResult.getItems();
+                        if (list.size() == 0) {
+                            checkInList.add(new CheckInHistory(name, count, lastVisited, placeID, null));
+                            checkInAdapter.notifyItemInserted(checkInList.size());
+                        } else {
+                            list.get(0).getDownloadUrl().addOnSuccessListener(uri -> {
+                                UrlToBitmap whatever = new UrlToBitmap(uri.toString());
+                                Thread thread = new Thread(whatever);
+                                thread.start();
+                                try {
+                                    thread.join();
+                                    Bitmap image = whatever.getImageBitmap();
+                                    checkInList.add(new CheckInHistory(name, count, lastVisited, placeID, image));
+                                    checkInAdapter.notifyItemInserted(checkInList.size());
+                                } catch (InterruptedException e) {
+                                    Log.i("not done", "done");
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                        }
+                    }
+                });
             }
         });
     }
