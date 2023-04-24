@@ -193,39 +193,36 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginBottom="10dp"
                         android:text="Check In History"
-                        android:textSize="15sp" />
+                        android:textSize="20dp"
+                        android:textStyle="bold"/>
 
-                    <TextView
-                        android:id="@+id/checkInHistory"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:fontFamily="sans-serif-light"
-                        android:text="Northeastern University - 04/22/23\nMIT - 04/23/23"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <View
+                    <include
+                        layout="@layout/check_in_history_recycler_view"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginBottom="15dp"
-                        android:background="?attr/colorPrimaryVariant" />
-
-
+                        android:layout_height="match_parent" />
                 </LinearLayout>
-            </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/checkInHistory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:fontFamily="sans-serif-light"
+                    android:text="Northeastern University - 04/22/23\nMIT - 04/23/23"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-                <include
-                    layout="@layout/check_in_history_recycler_view"
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="1dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:background="?attr/colorPrimaryVariant" />
             </LinearLayout>
 
         </LinearLayout>
