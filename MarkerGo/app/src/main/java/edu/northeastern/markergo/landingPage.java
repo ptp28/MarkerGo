@@ -292,7 +292,6 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void UpdateCurrentLocation() {
-        Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
         if (currentLocationMarker != null) {
             currentLocationMarker.remove();
         }
