@@ -111,6 +111,29 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/textViewAddedByLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Added By:"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textViewAddedBy"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Placeholder"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
                             android:id="@+id/textViewDescriptionLabel"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -124,11 +147,6 @@
                             android:layout_height="wrap_content"
                             android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
                             android:textSize="16sp" />
-
-                        <nl.dionsegijn.konfetti.xml.KonfettiView
-                            android:id="@+id/konfettiView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
 
                     </LinearLayout>
 
@@ -239,6 +257,11 @@
 
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <nl.dionsegijn.konfetti.xml.KonfettiView
+        android:id="@+id/konfettiView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </FrameLayout>
 

@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -24,6 +25,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -112,6 +115,7 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
     private LatLng pointToBeAdded;
     private Dialog addLocationDialog;
     private Dialog successDialog;
+    private Dialog cantAddLocationDialog;
     private KonfettiView konfettiView;
     private Party party;
 
@@ -374,9 +378,27 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 intent.putExtra("location", pointToBeAdded);
                 startActivityForResult(intent, ADD_MARKER_REQUEST_CODE);
             } else {
-                Toast.makeText(getApplicationContext(), "You need at-least 500 points to add a new location", Toast.LENGTH_LONG).show();
+                showCantAddLocationDialog();
             }
         });
+    }
+
+    private void showCantAddLocationDialog() {
+        View content = inflater.inflate(R.layout.alert_dialog, null);
+        ImageView imageIcon = content.findViewById(R.id.img_icon);
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.alert_triangle);
+        imageIcon.setImageBitmap(icon);
+        TextView titleTV = content.findViewById(R.id.txttite);
+        titleTV.setText("Cannot Add!");
+        TextView textTV = content.findViewById(R.id.txtDesc);
+        textTV.setText("You need at-least 500 points to add a new location. Check-in to some places to enable this feature.");
+        LinearLayout buttonsLayout = content.findViewById(R.id.buttonsLayout);
+        buttonsLayout.setVisibility(View.GONE);
+
+        cantAddLocationDialog = new Dialog(this);
+        cantAddLocationDialog.setContentView(content);
+        cantAddLocationDialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_window);
+        cantAddLocationDialog.show();
     }
 
     public void cancelDialog(View view) {
@@ -386,6 +408,10 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
 
         if (successDialog != null) {
             successDialog.cancel();
+        }
+
+        if(cantAddLocationDialog != null) {
+            cantAddLocationDialog.cancel();
         }
     }
 
