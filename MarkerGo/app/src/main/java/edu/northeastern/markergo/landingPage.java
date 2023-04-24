@@ -39,6 +39,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.facebook.login.LoginManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -225,6 +226,9 @@ public class landingPage extends AppCompatActivity implements OnMapReadyCallback
                 return true;
             case R.id.logout_item:
                 mAuth.signOut();
+                LoginManager.getInstance().logOut();
+                LoginManager.getInstance().logOut();
+                LoginManager.getInstance().logOut();
                 Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(landingPage.this, MainActivity.class));
                 return true;

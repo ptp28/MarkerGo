@@ -30,6 +30,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.navigation.NavigationView;
@@ -249,7 +252,10 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 return true;
             case R.id.logout_item:
                 mAuth.signOut();
-                Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+                LoginManager.getInstance().logOut();
+                LoginManager.getInstance().logOut();
+                LoginManager.getInstance().logOut();
+                Toast.makeText(this, "Logged out " + (user == null), Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(LocationDetailsActivity.this, MainActivity.class));
                 return true;
             default:
