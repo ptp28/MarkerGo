@@ -6,17 +6,16 @@
 
     <ImageView
         android:id="@+id/locationImage"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:padding="5dp"
         android:src="@drawable/image_palceholder"
         android:layout_margin="2dp"
-        android:layout_weight="1"
         android:scaleType="centerCrop"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
         android:orientation="vertical">
 
         <TextView

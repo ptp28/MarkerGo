@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="7dp"
         android:background="@drawable/time_visit_button_bg"
-        android:onClick="testFunction"
         android:orientation="horizontal">
 
         <TextView
