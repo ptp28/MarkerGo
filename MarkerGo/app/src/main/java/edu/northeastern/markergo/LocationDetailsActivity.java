@@ -38,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -80,6 +81,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     boolean isFirstImage = true;
     List<Uri> imageSources;
     private TextView descriptionTextView;
+    private TextView addedByTextView;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private ImageView appbarCoverImage;
     private TextView seeAllPhotosLinkTextView;
@@ -145,6 +147,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 .build();
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        addedByTextView = findViewById(R.id.textViewAddedBy);
         descriptionTextView = findViewById(R.id.textViewDescription);
         collapsingToolbarLayout = findViewById(R.id.CollapsingToolbarLayout);
         appbarCoverImage = findViewById(R.id.app_bar_image);
@@ -201,6 +204,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
             }
 
             imagesRef = storageRef.child(markerDetails.getName() + "/");
+            this.setAddedBy(markerDetails.getAddedBy());
             this.setDescription(markerDetails.getDescription());
             this.setToolbarTitle(markerDetails.getName());
         } else {
@@ -283,6 +287,16 @@ public class LocationDetailsActivity extends AppCompatActivity {
                         });
                     }
                 });
+    }
+
+    private void setAddedBy(String addedBy) {
+        usersCollectionRef.document(addedBy).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Map<String, Object> data = documentSnapshot.getData();
+                addedByTextView.setText(String.valueOf(data.get("name")));
+            }
+        });
     }
 
     private void setDescription(String description) {
