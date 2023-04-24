@@ -316,17 +316,26 @@ public class LocationDetailsActivity extends AppCompatActivity {
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), markerDetails.getLatitude(), markerDetails.getLongitude(), result);
         if (result[0] <= 100) {
             if (user != null) {
-                updateVisitationStatsForMarker();
-                updateCheckInForUser();
+                if (fifteenMinsPassedFromPrevCheckin()) {
+                    updateVisitationStatsForMarker();
+                    updateCheckInForUser();
+                } else {
+                    showFailedCheckInDialog("Looks like you have checked-in to this place less than 15 minutes ago. Come back later for a new check-in.");
+                }
             } else {
                 Toast.makeText(getApplicationContext(), "sign in to update stuff on firebase", Toast.LENGTH_SHORT).show();
             }
         } else {
-            showFailedCheckInDialog();
+            showFailedCheckInDialog("Oops! Looks like you are more than 100m away from this location.\nPlease try again when yo are within 100m.");
         }
     }
 
-    private void showFailedCheckInDialog() {
+    private boolean fifteenMinsPassedFromPrevCheckin() {
+        long timestamp = new Date().getTime();
+        return timestamp - this.lastVisited >= 900000;
+    }
+
+    private void showFailedCheckInDialog(String msg) {
         View content = inflater.inflate(R.layout.alert_dialog, null);
         ImageView imageIcon = content.findViewById(R.id.img_icon);
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.alert_triangle);
@@ -334,7 +343,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         TextView titleTV = content.findViewById(R.id.txttite);
         titleTV.setText("Failed Check-in!");
         TextView textTV = (TextView) content.findViewById(R.id.txtDesc);
-        textTV.setText("Oops! Looks like you are more than 100m away from this location.\nPlease try again when yo are within 100m.");
+        textTV.setText(msg);
         LinearLayout buttonsLayout = content.findViewById(R.id.buttonsLayout);
         buttonsLayout.setVisibility(View.GONE);
 
